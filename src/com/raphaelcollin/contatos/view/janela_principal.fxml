@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<?import java.net.URL?>
+
+<BorderPane fx:id="borderPane" fx:controller="com.raphaelcollin.contatos.controller.ControllerPrincipal"
+            xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets top="20" bottom="20"/>
+    </padding>
+    <stylesheets>  <!-- Inclusao do CSS -->
+        <URL value="@/com/raphaelcollin/contatos/estilo.css"/>
+    </stylesheets>
+    <center>
+        <GridPane alignment="TOP_CENTER" vgap="10">
+
+                <!-- Text Field da Janela Principal -->
+
+            <TextField fx:id="textField" promptText="Nome do Contato" GridPane.rowIndex="0" GridPane.columnIndex="0">
+                <font>
+                    <Font name="Arial" size="22"/>
+                </font>
+            </TextField>
+
+                <!-- Botao de adicionar novo Contato -->
+
+            <Button onAction="#handleButton" fx:id="searchButton" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                <!-- List View -->
+
+            <ListView onKeyPressed="#handleKeyPressed" onMouseClicked="#handleListDoubleClick" fx:id="listView"
+                      GridPane.vgrow="ALWAYS" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+
+                <!-- Botoes Abrir Contato e Excluir Contato -->
+
+            <HBox spacing="10" alignment="CENTER_RIGHT" GridPane.rowIndex="6" GridPane.columnIndex="0" GridPane.columnSpan="2">
+
+                <Button defaultButton="true" onAction="#handleAbrirContato" id="adicionar-button" text="Abrir Contato">
+                    <font>
+                        <Font name="Arial" size="24"/>
+                    </font>
+                </Button>
+                <Button onAction="#handleExcluir" id="cancelar-button" text="Excluir Contato">
+                    <font>
+                        <Font name="Arial" size="24"/>
+                    </font>
+                </Button>
+
+            </HBox>
+
+        </GridPane>
+    </center>
+</BorderPane>
