@@ -65,7 +65,11 @@ public class Contato {
         return id;
     }
 
-        /* Metodo to String  Retornara apenas o nome pois a ListView sera de Objetos do tipo Contato
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /* Metodo to String  Retornara apenas o nome pois a ListView sera de Objetos do tipo Contato
          * Entao para aparecer somente o nome do contato na Lista vamos apenas retornar o nome Do contato */
 
     @Override

@@ -107,20 +107,16 @@ public class ControllerDetalhes {
     * Primeiramente, vamos verfificar se os campos nao estao vazios e se possuem valores validos.
     *
     * Se os campos nao possuirem valores validos, vamos exibir um alert e finalizar o metodo
-    * Se os campos forem validos, vamos verificar quais campos foram alterados pelo usuarios para poder montar as queries
+    * Se os campos forem validos, vamos verificar quais campos foram alterados pelo usuarios para poder montar a query
     * corretamente.
     *
     * Se nenhum campos for alterado, vamos simplesmente deixar todos os campos no mode de somente leitura e retornar para o botao
     * Editar.
-    * Se houver campos alterados, vamos executar as queries uma a uma. Vamos criar duas listas: A lista dos dados atualizados
-    * com sucesso e a lista dos dados que nao puderam ser atualizados.
     *
-    * Nesse processo podem acontecer erros como: O usuario trocar o nome para um nome que ja esteja cadastrado, etc...
+    * Nesse processo podem acontecer erros como: usuario trocar o nome para um nome que ja esteja cadastrado, etc...
     *
-    * No final vamos ter tres tipos de alert diferentes: Se todos os campos forem atualizados com sucesso, Se alguns campos
-    * forem atualizados com sucesso e se nenhum campo foi atualizado.
-    *
-    * Se alguns campos forem atualizados com sucesso, vamos exibir um alert mostrando quais foram alterados e quais nao foram
+    * Se a query for executada com sucesso no banco, vamos exibir um altert de confirmacao
+    * Se não vamos exibir uma mensagem de erro
     * */
 
     private void handleSalvar(ActionEvent event){
@@ -146,146 +142,111 @@ public class ControllerDetalhes {
             alert.setHeaderText("Campo inválido");
             alert.setContentText(erro);
             alert.show();
-            return;
         }
 
+        if (!erroEncontrado){
 
-        if (!(nomeField.getText().equals(contato.getNome()) && numeroField.getText().equals(contato.getNumero())
-            && emailField.getText().equals(contato.getEmail()) && ((contato.getDescricao() != null && descricaoField.getText().isEmpty())
-                || (contato.getDescricao() != null && descricaoField.getText().equals(contato.getDescricao()))))){
+            StringBuilder sql = new StringBuilder("update contatos ");
 
-            ContatoDAO contatoDAO = new ContatoDAO();
-
-            String sql;
-            boolean result;
-
-                // Lista dos campos que foram atualizados com sucesso e dos que nao foram
-
-            List<String> sucesso = new ArrayList<>();
-            List<String> falha = new ArrayList<>();
-
-                // Contador de Queries atualizados com sucesso
+            List<String> campos = new ArrayList<>();
 
             int count = 0;
 
-            if (!nomeField.getText().equals(contato.getNome())){
-                sql = "update Contatos set nome = '" + nomeField.getText() + "' where idContato = " + contato.getId();
-                result = contatoDAO.updateContato(sql);
-                if (result){
-                    sucesso.add("Nome");
-                    contato.setNome(nomeField.getText());
+
+                /* Se a condicao abaixo for verdadeira, significa que algum campo foi alterado, ou seja o contato
+                    foi alterado, entao a atualizacao no banco precisa ser feita, se a condicao for falsa, ou seja,
+                    nenhum campo foi alterada, vamos apenas retornar ao estado de visualizacao do contato */
+
+            if (!(nomeField.getText().equals(contato.getNome()) && numeroField.getText().equals(contato.getNumero())
+                    && emailField.getText().equals(contato.getEmail()) && ((contato.getDescricao() != null && descricaoField.getText().isEmpty())
+                    || (contato.getDescricao() != null && descricaoField.getText().equals(contato.getDescricao()))))) {
+
+                /* Estou usando o caracter especial ? ao invés de concatenar diretamente a string para eveitar ataques
+                 * SQLInjection */
+
+                if (!nomeField.getText().equals(contato.getNome())){
+                    sql.append("set nome = ?");
+                    campos.add(nomeField.getText());
+                    count++;
+                }
+
+                if (!numeroField.getText().equals(contato.getNumero())){
+                    if (count == 1) {
+                        sql.append(", ");
+                        sql.append("numero = ?");
+                    } else {
+                        sql.append("set numero = ?");
+                    }
+
+                    campos.add(numeroField.getText());
+                    count++;
+                }
+
+                if (!emailField.getText().equals(contato.getEmail())){
+                    if (count >= 1) {
+                        sql.append(", ");
+                        sql.append("email = ?");
+                    } else {
+                        sql.append("set email = ?");
+                    }
+                    campos.add(emailField.getText());
+                    count++;
+                }
+
+                if ((contato.getDescricao() == null && !descricaoField.getText().trim().isEmpty()) || (contato.getDescricao() != null
+                        && !descricaoField.getText().equals(contato.getDescricao()))) {
+                    if (count >= 1) {
+                        sql.append(", ");
+                        sql.append("descricao = ?");
+                    } else {
+                        sql.append("set descricao = ?");
+                    }
+
+                    campos.add(descricaoField.getText());
+                }
+
+                sql.append(" where idContato = ?");
+
+                boolean result = ContatoDAO.getInstance().updateContato(sql.toString(),campos,contato.getId());
+
+                if (result) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.initOwner(gridPane.getScene().getWindow());
+                    alert.setTitle("Processamento Realizado");
+                    alert.setHeaderText("Contato atualizado com sucesso");
+                    alert.setContentText("O contato foi atualizado e já está disponível na lista de contatos!");
+                    alert.show();
+
+                    inicializarCampos(ContatoDAO.getInstance().selectContato(contato.getId()));
+
+                    nomeField.setEditable(false);
+                    numeroField.setEditable(false);
+                    emailField.setEditable(false);
+                    descricaoField.setEditable(false);
+                    Button button = (Button) event.getSource();
+                    button.setText("Editar");
+                    button.setId("adicionar-button");
+                    button.setOnAction(event1 -> handleEditar(event));
+
                 } else {
-                    falha.add("Nome");
-                }
-                count++;
-
-            }
-            if (!numeroField.getText().equals(contato.getNumero())){
-               sql = "update Contatos set numero = '" + numeroField.getText() + "' where idContato = " + contato.getId();
-               result = contatoDAO.updateContato(sql);
-                if (result){
-                    sucesso.add("Número");
-                    contato.setNumero(numeroField.getText());
-                } else {
-                    falha.add("Número");
-                }
-                count++;
-            }
-            if(!emailField.getText().equals(contato.getEmail())){
-                sql = "update Contatos set email = '" + emailField.getText() + "' where idContato = " + contato.getId();
-                result = contatoDAO.updateContato(sql);
-                if (result){
-                    sucesso.add("E-mail");
-                    contato.setEmail(emailField.getText());
-                } else {
-                    falha.add("E-mail");
-                }
-                count++;
-            }
-            if((contato.getDescricao() == null && !descricaoField.getText().trim().isEmpty()) || (contato.getDescricao() != null
-                && !descricaoField.getText().equals(contato.getDescricao()))){
-                sql = "update Contatos set descricao = '" + descricaoField.getText() + "' where idContato = " + contato.getId();
-                result = contatoDAO.updateContato(sql);
-                if (result){
-                    sucesso.add("Descrição");
-                    contato.setDescricao(descricaoField.getText());
-                } else {
-                    falha.add("Descrição");
-                }
-                count++;
-            }
-
-            contatoDAO.closeConnection();
-
-
-            if (sucesso.size() == count){
-                nomeField.setEditable(false);
-                numeroField.setEditable(false);
-                emailField.setEditable(false);
-                descricaoField.setEditable(false);
-                Button button = (Button) event.getSource();
-                button.setText("Editar");
-                button.setId("adicionar-button");
-                button.setOnAction(event1 -> handleEditar(event));
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.initOwner(gridPane.getScene().getWindow());
-                alert.setTitle("Processamento Realizado");
-                alert.setHeaderText("Contato atualizado com sucesso");
-                alert.setContentText("O contato atualizado já está disponível na lista de contatos!");
-                alert.show();
-            } else if (sucesso.size() >= 1 && sucesso.size() < count) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.initOwner(gridPane.getScene().getWindow());
-                alert.setTitle("Processamento Realizado");
-                alert.setHeaderText("Contato atualizado com alguns erros");
-
-                StringBuilder stringBuilder = new StringBuilder(sucesso.get(0));
-                for (int c = 1; c < sucesso.size(); c++){
-                    stringBuilder.append(", ");
-                    stringBuilder.append(sucesso.get(c));
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.initOwner(gridPane.getScene().getWindow());
+                    alert.setTitle("Erro no Processamento");
+                    alert.setHeaderText("Não foi possível atualizar o contato");
+                    alert.setContentText("Verifique se os novos campos já não foram adicionados a outros contatos");
+                    alert.show();
                 }
 
-                StringBuilder stringBuilder2 = new StringBuilder(falha.get(0));
-                for (int c = 1; c < falha.size(); c++){
-                    stringBuilder2.append(", ");
-                    stringBuilder2.append(falha.get(c));
-                }
-
-                StringBuilder stringBuilderFinal = new StringBuilder("Campos atualizados com sucesso: ");
-                stringBuilderFinal.append(stringBuilder.toString());
-                stringBuilderFinal.append("\n");
-                stringBuilderFinal.append("Campos não atualizados: ");
-                stringBuilderFinal.append(stringBuilder2.toString());
-                stringBuilderFinal.append("\n");
-                stringBuilderFinal.append("Verifique se os novos valores já não estão cadastrados em outros usuários");
-                alert.setContentText(stringBuilderFinal.toString());
-                alert.show();
-
-                nomeField.setEditable(false);
-                numeroField.setEditable(false);
-                emailField.setEditable(false);
-                descricaoField.setEditable(false);
-                Button button = (Button) event.getSource();
-                button.setText("Editar");
-                button.setId("adicionar-button");
-                button.setOnAction(event1 -> handleEditar(event));
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.initOwner(gridPane.getScene().getWindow());
-                alert.setTitle("Erro no processamento");
-                alert.setHeaderText("Não foi possível atualizar o contato");
-                alert.setContentText("Verifique se os novos dados já não estão cadastrados em outros contatos");
-                alert.show();
+                nomeField.setEditable(false);
+                numeroField.setEditable(false);
+                emailField.setEditable(false);
+                descricaoField.setEditable(false);
+                Button button = (Button) event.getSource();
+                button.setText("Editar");
+                button.setId("adicionar-button");
+                button.setOnAction(event1 -> handleEditar(event));
             }
-        } else {
-            nomeField.setEditable(false);
-            numeroField.setEditable(false);
-            emailField.setEditable(false);
-            descricaoField.setEditable(false);
-            Button button = (Button) event.getSource();
-            button.setText("Editar");
-            button.setId("adicionar-button");
-            button.setOnAction(event1 -> handleEditar(event));
         }
 
     }

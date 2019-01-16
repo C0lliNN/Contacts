@@ -5,6 +5,7 @@ import com.raphaelcollin.contatos.model.Contato;
 import com.raphaelcollin.contatos.model.ContatoDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,6 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import java.awt.*;
 import java.io.IOException;
 import java.util.Optional;
@@ -73,16 +75,18 @@ public class ControllerPrincipal {
             if (!newValue.isEmpty()){
                 ObservableList<Contato> contatos = FXCollections.observableArrayList();
                 for (Contato contato : contatosList){
-                    if (contato.getNome().toLowerCase().contains(textField.getText().toLowerCase())){
+                    if (contato.getNome().toLowerCase().indexOf(textField.getText().toLowerCase()) == 0){
                         contatos.add(contato);
                     }
                 }
-                listView.setItems(contatos);
+                listView.itemsProperty().unbind();
+                listView.itemsProperty().set(contatos);
             } else {
-                listView.setItems(contatosList);
+                listView.itemsProperty().set(contatosList);
             }
             listView.getSelectionModel().selectFirst();
         });
+
 
             // Colocando Menus de Contexto para List View
 
@@ -98,13 +102,24 @@ public class ControllerPrincipal {
 
             // Carregando os Contatos do banco de Dados
 
-        ContatoDAO contatoDAO = new ContatoDAO();
+        Task<ObservableList<Contato>> task = new Task<ObservableList<Contato>>() {
+            @Override
+            protected ObservableList<Contato> call(){
+                return ContatoDAO.getInstance().selectContatos();
+            }
+        };
 
-        contatosList = contatoDAO.selectContatos();
+            // Lista auxilar para fazer a pesquisa em tempo real dos contatos
 
-        listView.setItems(contatosList);
+        contatosList = ContatoDAO.getInstance().selectContatos();
 
-        listView.getSelectionModel().selectFirst();
+            // Utilizando outro Thread para fazer a leitura dos dados no Banco de Dados
+
+        listView.itemsProperty().bind(task.valueProperty());
+
+        new Thread(task).start();
+
+        listView.getSelectionModel().select(0);
 
         
     }
@@ -150,31 +165,66 @@ public class ControllerPrincipal {
 
     @FXML
     public void handleExcluir(){
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.initOwner(borderPane.getScene().getWindow());
-        alert.setTitle("Confirmação");
-        alert.setHeaderText("Tem certeza que deseja excluir o contato " + listView.getSelectionModel().getSelectedItem() + "?");
-        alert.setContentText("Clique em Ok para confirmar e em Cancelar para voltar");
-        Optional<ButtonType> result = alert.showAndWait();
 
-        if (result.isPresent() && result.get().equals(ButtonType.OK)){
-            ContatoDAO contatoDAO = new ContatoDAO();
-            boolean result2 = contatoDAO.deleteContato(listView.getSelectionModel().getSelectedItem().getId());
-            if (result2){
-                listView.getItems().remove(listView.getSelectionModel().getSelectedItem());
-            } else {
-                Alert alert1 = new Alert(Alert.AlertType.ERROR);
-                alert1.initOwner(borderPane.getScene().getWindow());
-                alert1.setTitle("Erro no processamento");
-                alert1.setTitle("Não foi possível excluir o contato " + listView.getSelectionModel().getSelectedItem());
-                alert1.setTitle("Ocorreu um erro ao tentar excluir esse contato. Tente mais tarde");
-                alert.show();
+        Contato contato = listView.getSelectionModel().getSelectedItem();
+
+        if (contato != null){
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.initOwner(borderPane.getScene().getWindow());
+            alert.setTitle("Confirmação");
+            alert.setHeaderText("Tem certeza que deseja excluir o contato " + contato + "?");
+            alert.setContentText("Clique em Ok para confirmar e em Cancelar para voltar");
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get().equals(ButtonType.OK)){
+                boolean result2 = ContatoDAO.getInstance().deleteContato(contato.getId());
+                if (result2){
+                    listView.getItems().remove(contato);
+                } else {
+                    Alert alert1 = new Alert(Alert.AlertType.ERROR);
+                    alert1.initOwner(borderPane.getScene().getWindow());
+                    alert1.setTitle("Erro no processamento");
+                    alert1.setTitle("Não foi possível excluir o contato " + listView.getSelectionModel().getSelectedItem());
+                    alert1.setTitle("Ocorreu um erro ao tentar excluir esse contato. Tente mais tarde");
+                    alert.show();
+                }
             }
         }
+
     }
 
-        // Se o usuario apertar a tecla Delete do teclado, vamos executar o metodo para excluir o contato
-        // Se o usuario apertar a tecla Enter do teclado, vamos executar o metodo para abrir o contato
+        /* Quando esse metodo for chamado, vamos carregar outra janela onde sera possivel o usuario ver as informacoes
+         * do usuario selecionado */
+
+    private void abrirJanelaEditarContato(){
+        Contato contato = listView.getSelectionModel().getSelectedItem();
+
+        if (contato != null){
+            Stage stage = (Stage) borderPane.getScene().getWindow();
+            FXMLLoader fxmlLoader;
+            try {
+                fxmlLoader = new FXMLLoader(getClass().getResource("/com/raphaelcollin/contatos/view/janela_detalhes.fxml"));
+                GridPane gridPane = fxmlLoader.load();
+
+                ControllerDetalhes controllerDetalhes = fxmlLoader.getController();
+                controllerDetalhes.inicializarCampos(contato);
+
+                Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+
+                double width = screenSize.width * 0.3;
+                double heigth = screenSize.height * 0.6;
+
+                stage.setScene(new Scene(gridPane,width,heigth));
+
+            } catch (IOException e){
+                System.out.println("Erro: " + e.getMessage());
+            }
+        }
+
+    }
+
+    // Se o usuario apertar a tecla Delete do teclado, vamos executar o metodo para excluir o contato
+    // Se o usuario apertar a tecla Enter do teclado, vamos executar o metodo para abrir o contato
 
     @FXML
     public void handleKeyPressed(KeyEvent event) {
@@ -183,32 +233,6 @@ public class ControllerPrincipal {
         }
         if(event.getCode().equals(KeyCode.ENTER)){
             handleAbrirContato();
-        }
-    }
-
-        /* Quando esse metodo for chamado, vamos carregar outra janela onde sera possivel o usuario ver as informacoes
-         * do usuario selecionado */
-
-    private void abrirJanelaEditarContato(){
-        Contato contato = listView.getSelectionModel().getSelectedItem();
-        Stage stage = (Stage) borderPane.getScene().getWindow();
-        FXMLLoader fxmlLoader;
-        try {
-            fxmlLoader = new FXMLLoader(getClass().getResource("/com/raphaelcollin/contatos/view/janela_detalhes.fxml"));
-            GridPane gridPane = fxmlLoader.load();
-
-            ControllerDetalhes controllerDetalhes = fxmlLoader.getController();
-            controllerDetalhes.inicializarCampos(contato);
-
-            Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-
-            double width = screenSize.width * 0.3;
-            double heigth = screenSize.height * 0.6;
-
-            stage.setScene(new Scene(gridPane,width,heigth));
-
-        } catch (IOException e){
-            System.out.println("Erro: " + e.getMessage());
         }
     }
 

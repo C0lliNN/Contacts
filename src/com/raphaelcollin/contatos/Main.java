@@ -7,6 +7,8 @@ package com.raphaelcollin.contatos;
 
 import java.awt.Dimension;
 import java.io.IOException;
+
+import com.raphaelcollin.contatos.model.ContatoDAO;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -35,6 +37,11 @@ public class Main extends Application {
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/com/raphaelcollin/contatos/imagens/icon.png")));
         primaryStage.show();
+    }
+
+    @Override
+    public void stop(){
+        ContatoDAO.getInstance().closeConnection();
     }
 
     public static void main(String[] args) {

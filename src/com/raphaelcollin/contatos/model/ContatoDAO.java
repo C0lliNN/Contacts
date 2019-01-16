@@ -8,18 +8,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 public class ContatoDAO {
+
+            /* Nessa classe, estamos utilizando o metodo de Singleton que permite apenas uma unica instancia de uma
+             * classe */
 
         // Conexao
     
     private Connection connection;
 
+    private static ContatoDAO instance = new ContatoDAO();
+
         // Obetendo conexao
     
-    public ContatoDAO(){
+    private ContatoDAO(){
         connection = ConnectionFactory.getConnection();
     }
 
@@ -27,43 +31,69 @@ public class ContatoDAO {
          * Esse metodo recebera um Objeto da Classe Contato e retornara true no caso de sucesso
           * e false no caso de erro*/
         
-    public boolean insertContato(Contato contato){
-        PreparedStatement statement = null;
+    public int insertContato(Contato contato){
         
         String sql = "insert into Contatos values(null,?,?,?,?)";
         
-        try {
-            statement = connection.prepareStatement(sql);
+        try (PreparedStatement statement = connection.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, contato.getNome());
             statement.setString(2, contato.getNumero());
             statement.setString(3, contato.getEmail());
             statement.setString(4, contato.getDescricao());
-            
-            statement.executeUpdate();
-            return true;
+
+            statement.execute();
+
+            ResultSet resultSet = statement.getGeneratedKeys();
+
+            resultSet.next();
+
+            int idGerado = resultSet.getInt(1);
+
+            resultSet.close();
+
+            return idGerado;
+
         } catch (SQLException ex) {
             System.err.println("Erro: " + ex.getMessage());
-            return false;
-        } finally {
-            ConnectionFactory.closeConnection(connection, statement);
-        }       
+            return -1;
+        }
     }
+
+    public Contato selectContato(int id){
+        try (PreparedStatement statement = connection.prepareStatement("select * from contatos where idContato = ?"
+            , PreparedStatement.RETURN_GENERATED_KEYS)){
+            statement.setInt(1,id);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            resultSet.next();
+
+            Contato contato = new Contato(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3)
+                , resultSet.getString(4),resultSet.getString(5));
+
+            resultSet.close();
+
+            return contato;
+
+
+        } catch (SQLException e){
+            System.out.println("Erro: " + e.getMessage());
+            return null;
+        }
+    }
+
 
         /* Esse metodo sera executado toda vez que a pagina principal da Aplicacao for carregada
          * Esse metodo vai retorar a lista de todos os contatos cadastrados no banco ordenados em ordem alfabetica */
 
     public ObservableList<Contato> selectContatos(){
-        PreparedStatement statement = null;
 
         String sql = "select * from Contatos order by nome";
 
-        ResultSet resultSet = null;
-
         ObservableList<Contato> contatos = FXCollections.observableArrayList();
 
-        try {
-            statement = connection.prepareStatement(sql);
-            resultSet = statement.executeQuery();
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()){
                 Contato contato = new Contato(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3)
@@ -75,18 +105,24 @@ public class ContatoDAO {
         } catch (SQLException e){
             System.out.println("Erro: " + e.getMessage());
             return null;
-        } finally {
-            ConnectionFactory.closeConnection(connection,statement,resultSet);
         }
     }
 
         /* Esse metodo vai atualizar um contato no banco
-         * Esse metodo vai receber uma string que sera executada e retornara true no caso de sucesso e false no caso de erro */
+         * Esse metodo vai receber uma string que sera executada, os atributos dos campos que serao atualizados, o id
+          * do contato e retornara true no caso de sucesso e false no caso de erro */
 
-    public boolean updateContato(String sql) {
+    public boolean updateContato(String sql,List<String> campos, int id) {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
+
+            for (int c = 0; c < campos.size(); c++){
+                preparedStatement.setString(c+1,campos.get(c));
+            }
+
+            preparedStatement.setInt(campos.size() + 1,id);
+
+            preparedStatement.execute();
             return true;
         } catch (SQLException e){
             System.err.println("Erro: " + e.getMessage());
@@ -98,22 +134,26 @@ public class ContatoDAO {
          *  Esse metodo vai receber o id do contato e retornara true no caso de sucesso e false no caso de erro */
 
     public boolean deleteContato(int id){
-        PreparedStatement statement = null;
-        try {
-            statement = connection.prepareStatement("delete from Contatos where idContato = " + id);
-            statement.executeUpdate();
+        try (PreparedStatement statement = connection.prepareStatement("delete from Contatos where idContato = ?")) {
+            statement.setInt(1,id);
+            statement.execute();
             return true;
         } catch (SQLException e){
             System.out.println("Erro: " + e.getMessage());
             return false;
-        } finally {
-            ConnectionFactory.closeConnection(connection,statement);
         }
     }
 
-        /* Metodo para fechar a conexao que sera util em alguns casos */
+        /* Fechando a Conexa com o Banco de Dados */
 
     public void closeConnection(){
         ConnectionFactory.closeConnection(connection);
+    }
+
+        // Getter
+
+
+    public static ContatoDAO getInstance() {
+        return instance;
     }
 }

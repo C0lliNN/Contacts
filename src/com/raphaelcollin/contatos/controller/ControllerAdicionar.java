@@ -137,10 +137,10 @@ public class ControllerAdicionar {
 
             Contato contato = new Contato(nome,numero,email,descricao);
 
-            ContatoDAO contatoDAO = new ContatoDAO();
-            boolean result = contatoDAO.insertContato(contato);
+            int result = ContatoDAO.getInstance().insertContato(contato);
 
-            if (result) {
+
+            if (result >= 0) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.initOwner(gridPane.getScene().getWindow());
                 alert.setTitle("Processamento Realizado");
@@ -152,6 +152,9 @@ public class ControllerAdicionar {
                 emailField.clear();
                 descricaoField.clear();
                 nomeField.requestFocus();
+
+                contato.setId(result);
+
             } else {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.initOwner(gridPane.getScene().getWindow());
