@@ -109,6 +109,8 @@ public class ControllerPrincipal {
             }
         };
 
+        task.setOnSucceeded(e -> listView.getSelectionModel().selectFirst());
+
             // Lista auxilar para fazer a pesquisa em tempo real dos contatos
 
         contatosList = ContatoDAO.getInstance().selectContatos();
@@ -118,8 +120,6 @@ public class ControllerPrincipal {
         listView.itemsProperty().bind(task.valueProperty());
 
         new Thread(task).start();
-
-        listView.getSelectionModel().select(0);
 
         
     }
