@@ -7,6 +7,7 @@ use Contatos;
 create table Contatos(
 	idContato int primary key auto_increment,
 	nome varchar(50) not null unique,
+	sexo enum('Masculino','Feminino'),
 	numero varchar(20) not null unique,
 	email varchar(50) not null unique,
 	descricao varchar(250)

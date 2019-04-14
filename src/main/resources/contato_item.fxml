@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.text.Font?>
+
+<GridPane xmlns:fx="http://javafx.com/fxml" hgap="20" vgap="-20"
+          fx:controller="com.raphaelcollin.contatos.controller.ControllerContato">
+
+    <ImageView fx:id="imageView" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="0"/>
+
+    <VBox alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="1">
+        <Label fx:id="idField" visible="false">
+            <font>
+                <Font size="1"/>
+            </font>
+        </Label>
+        <Label style="-fx-text-fill: #333333" fx:id="nomeField"/>
+        <Label fx:id="sexoField" visible="false">
+            <font>
+                <Font size="1"/>
+            </font>
+        </Label>
+        <Label style="-fx-text-fill: #7a7a7a" fx:id="numeroField"/>
+        <Label fx:id="emailField" visible="false">
+            <font>
+                <Font size="1"/>
+            </font>
+        </Label>
+
+        <Label fx:id="descricaoField" visible="false">
+            <font>
+                <Font size="1"/>
+            </font>
+        </Label>
+
+    </VBox>
+
+</GridPane>
