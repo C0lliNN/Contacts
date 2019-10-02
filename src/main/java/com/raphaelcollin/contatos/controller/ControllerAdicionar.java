@@ -1,27 +1,28 @@
 package com.raphaelcollin.contatos.controller;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXRadioButton;
 import com.raphaelcollin.contatos.model.Contato;
 import com.raphaelcollin.contatos.model.ContatoDAO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import java.awt.*;
+
 import java.io.IOException;
 
 
@@ -29,19 +30,25 @@ public class ControllerAdicionar {
 
 
     @FXML
-    private GridPane gridPane;
+    private GridPane root;
     @FXML
     private ImageView imageView;
     @FXML
     private ToggleGroup radioGroup;
     @FXML
-    private Label labelNome;
+    private JFXRadioButton masculinoRadio;
     @FXML
-    private Label labelNumero;
+    private JFXRadioButton femininoRadio;
     @FXML
-    private Label labelEmail;
+    private Label nomeLabel;
     @FXML
-    private Label labelDescricao;
+    private Label sexoLabel;
+    @FXML
+    private Label numeroLabel;
+    @FXML
+    private Label emailLabel;
+    @FXML
+    private Label descricaoLabel;
     @FXML
     private TextField nomeField;
     @FXML
@@ -51,40 +58,90 @@ public class ControllerAdicionar {
     @FXML
     private TextArea descricaoField;
     @FXML
+    private HBox hBoxRadio;
+    @FXML
     private JFXButton voltarButton;
     @FXML
     private JFXButton adicionarButton;
 
-    // Quantidade máxima de caracteres permitidos no textArea Descrição
+    // Tamanho atual da tela
 
+    private Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
+
+    /* CONSTANTES */
+
+    // Quantidade máxima de caracteres permitidos no textArea Descrição
     private static final int MAX_TEXTAREA_LENGTH = 245;
 
     // Regex de validação do campo email
-
     private static final String EMAIL_REG_EXP = "(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
 
     // Regex de validação do campo número
-
     private static final String NUM_REG_EXP = "\\d{8,12}";
+
+    private static final String URL_IMAGEM_ICONE = "file:arquivos/add-contact.png";
+    private static final String CLASSE_BOTAO_VOLTAR =  "botao-laranja";
+    private static final String CLASSE_BOTAO_ADICIONAR =  "botao-azul";
+    private static final String CLASSE_FIELD = "adicionar-field";
+    private static final String CLASSE_BORDA_VERMELHA = "borda-vermelha";
+    private static final String URL_JANELA_PRINCIPAL = "/janela_principal.fxml";
 
     public void initialize(){
 
-            // Imagem
+        // Padding, Gaps e Spacing
 
-        imageView.setImage(new Image("file:arquivos/add-contact.png"));
+        root.setPadding(new Insets(tamanhoTela.getHeight() * 0.018518, tamanhoTela.getWidth() * 0.026041,
+                tamanhoTela.getHeight() * 0.018518, tamanhoTela.getWidth() * 0.026041));
+        root.setHgap(tamanhoTela.getWidth() * 0.0052083);
+        root.setVgap(tamanhoTela.getHeight() * 0.018518);
+        hBoxRadio.setSpacing(tamanhoTela.getWidth() * 0.0052083);
 
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        // Definindo Tamanho das Fontes
 
-        imageView.setFitWidth(dimension.width * 0.06);
-        imageView.setFitHeight(dimension.width * 0.06);
+        double tamanhoFonte = tamanhoTela.getWidth() * 0.01145;
+
+        nomeLabel.setFont(new Font(tamanhoFonte));
+        nomeField.setFont(new Font(tamanhoFonte));
+        sexoLabel.setFont(new Font(tamanhoFonte));
+        masculinoRadio.setFont(new Font(tamanhoFonte));
+        femininoRadio.setFont(new Font(tamanhoFonte));
+        numeroLabel.setFont(new Font(tamanhoFonte));
+        numeroField.setFont(new Font(tamanhoFonte));
+        emailLabel.setFont(new Font(tamanhoFonte));
+        emailField.setFont(new Font(tamanhoFonte));
+        descricaoLabel.setFont(new Font(tamanhoFonte));
+        descricaoField.setFont(new Font(tamanhoFonte));
+
+            // Alinhando e definindo tamanho de controles
+
+        imageView.setImage(new Image(URL_IMAGEM_ICONE));
+        imageView.setFitWidth(tamanhoTela.getWidth() * 0.06);
+        imageView.setFitHeight(tamanhoTela.getWidth() * 0.06);
+
+        voltarButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
+        voltarButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        voltarButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
+
+        adicionarButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
+        adicionarButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        adicionarButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
+
+        // CSS
+
+        voltarButton.getStyleClass().add(CLASSE_BOTAO_VOLTAR);
+        adicionarButton.getStyleClass().add(CLASSE_BOTAO_ADICIONAR);
+        nomeField.getStyleClass().add(CLASSE_FIELD);
+        numeroField.getStyleClass().add(CLASSE_FIELD);
+        emailField.getStyleClass().add(CLASSE_FIELD);
+        descricaoField.getStyleClass().add(CLASSE_FIELD);
 
             // Colocando Labels para os seus respectivos campos
 
-        labelNome.setLabelFor(nomeField);
-        labelNumero.setLabelFor(numeroField);
-        labelEmail.setLabelFor(emailField);
-        labelDescricao.setLabelFor(descricaoField);
-        labelDescricao.setOnMouseClicked( event -> descricaoField.requestFocus());
+        nomeLabel.setLabelFor(nomeField);
+        numeroLabel.setLabelFor(numeroField);
+        emailLabel.setLabelFor(emailField);
+        descricaoLabel.setLabelFor(descricaoField);
+        descricaoLabel.setOnMouseClicked(event -> descricaoField.requestFocus());
 
             // Criando efeito de sombra externa que será usado nos campos
 
@@ -94,9 +151,10 @@ public class ControllerAdicionar {
         numeroField.setEffect(dropShadow);
         emailField.setEffect(dropShadow);
         descricaoField.setEffect(dropShadow);
+        imageView.setEffect(dropShadow);
 
 
-            // Controlando o maximo de caracters do text Area descicao
+            // Controlando o máximo de caracters do textArea descrição
 
         descricaoField.textProperty().addListener( (observable, oldValue, newValue) -> {
             if (descricaoField.getText().length() > MAX_TEXTAREA_LENGTH){
@@ -105,49 +163,41 @@ public class ControllerAdicionar {
             }
         });
 
-            // Quando os campos Numero e E-mail pederem o foco, vamos verficar se eles sao validos
-            // Se nao forem vamos colocar uma borda vermelha nesse campo, mostrando para o usuario que algo esta errado
+            /* Quando os campos Número e E-mail pederem o foco, será verificado se eles são válidos
+               Se não forem, será colocada uma borda vermelha nesse campo, mostrando para o usuário que algo está errado */
 
         numeroField.focusedProperty().addListener(((observable, oldValue, newValue) -> {
            if (newValue) {
-               numeroField.getStyleClass().remove("borda-vermelha");
+               numeroField.getStyleClass().remove(CLASSE_BORDA_VERMELHA);
            }
            if (oldValue){
                if (!numeroField.getText().isEmpty() && !numeroField.getText().matches(NUM_REG_EXP)){
-                   numeroField.getStyleClass().add("borda-vermelha");
+                   numeroField.getStyleClass().add(CLASSE_BORDA_VERMELHA);
                }
            }
         }));
 
         emailField.focusedProperty().addListener( (observable, oldValue, newValue) -> {
             if (newValue){
-                emailField.getStyleClass().remove("borda-vermelha");
+                emailField.getStyleClass().remove(CLASSE_BORDA_VERMELHA);
             }
 
             if (oldValue) {
                 if(!emailField.getText().isEmpty() && !emailField.getText().matches(EMAIL_REG_EXP)){
-                    emailField.getStyleClass().add("borda-vermelha");
+                    emailField.getStyleClass().add(CLASSE_BORDA_VERMELHA);
                 }
             }
         });
 
-        // Configurando as dimensões e o tamanho da fonte dos botões adicionar e voltar
-
-        voltarButton.setPrefWidth(dimension.width * 0.3 / 2 - 54);
-        voltarButton.setFont(new javafx.scene.text.Font(dimension.width * 0.012));
-        voltarButton.setPrefHeight(40);
-        adicionarButton.setPrefWidth(dimension.width * 0.3 / 2 - 54);
-        adicionarButton.setFont(new Font(dimension.width * 0.012));
-        adicionarButton.setPrefHeight(40);
     }
 
     /*
-    * Primeiramente vamos verificar se existem campos obrigatorios que nao foram preenchidos ou se existem campos
-    * invalidos.
-    * Se isso acontecer, vamos exibir um Alert informando o erro ao usuario.
-    * Se nao for encontrado erro, vamos executar o query no banco atraves do objeto contatoDAO que retornara true em caso
-    * de sucesso e false em caso de erro. Se o contato for inserido com sucesso, vamos exibir um alert com a mensagem de sucesso,
-    * Se tiver sido ocorrido um erro ao inserir o contato, tambem vamos exibir um alert com uma mensagem de erro
+    * Primeiramente será verificado se existem campos obrigatórios que não foram preenchidos ou se existem campos
+    * inválidos.
+    * Se isso acontecer, será exibido um Alert informando o erro ao usuário.
+    * Se não for encontrado erro, será executada a query no banco através do objeto contatoDAO que retornará true em caso
+    * de sucesso e false em caso de erro. Se o contato for inserido com sucesso, será exibido um alert com a mensagem de sucesso,
+    * Se tiver sido ocorrido um erro ao inserir o contato, tambem será exibido um alert com uma mensagem de erro
     * */
 
     @FXML
@@ -186,13 +236,13 @@ public class ControllerAdicionar {
             Task<Integer> task = new Task<Integer>() {
                 @Override
                 protected Integer call(){
-                    gridPane.setCursor(Cursor.WAIT);
-                    return ContatoDAO.getInstance().insertContato(contato);
+                    root.setCursor(Cursor.WAIT);
+                    return ContatoDAO.getInstance().adicionarContato(contato);
                 }
             };
 
             task.setOnSucceeded(event -> {
-                gridPane.setCursor(Cursor.DEFAULT);
+                root.setCursor(Cursor.DEFAULT);
                 if (task.getValue() >= 0) {
                     exibirAlert(Alert.AlertType.INFORMATION,"Processamento Realizado","Contato inserido com sucesso",
                             "O contato foi adicionado a lista de contatos com sucesso!");
@@ -219,25 +269,22 @@ public class ControllerAdicionar {
         }
     }
 
-    /* Esse metodo sera executado quando o botao voltar for acionado
-     * Quando isso acontercer, vamos carregar a pagina principal da aplicaco
-     * com a largura sendo igual a 30% da altura total da tela
-     * e a altura sendo igual a 60% da altura total da tela*/
+    /* Esse método será executado quando o botão voltar for acionado
+     * Quando isso acontercer, será carregada a página principal da aplicação */
 
     @FXML
     public void handleVoltar() {
-        Stage stage = (Stage) gridPane.getScene().getWindow();
+        Stage stage = (Stage) root.getScene().getWindow();
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/janela_principal.fxml"));
-            Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-            stage.setScene(new Scene(root,screenSize.width * 0.3,screenSize.height * 0.6));
+            Parent root = FXMLLoader.load(getClass().getResource(URL_JANELA_PRINCIPAL));
+            stage.getScene().setRoot(root);
         } catch (IOException e){
             System.out.println("Erro: " + e.getMessage());
         }
 
     }
 
-    // Quando um Label for clicado, vamos dar foco para o seu respectivo campo
+    // Quando um Label for clicado, será dado foco para o seu respectivo campo
 
     @FXML
     public void handleLabelClick(MouseEvent mouseEvent) {
@@ -246,23 +293,11 @@ public class ControllerAdicionar {
         textField.requestFocus();
     }
 
-    @FXML
-    public void handleMouseEntered() {
-        gridPane.setCursor(Cursor.HAND);
-    }
-
-    // Quando o cursor do mouse sair de cima de algum botão, iremos voltar o cursor para o normal
-
-    @FXML
-    public void handleMouseExited() {
-        gridPane.setCursor(Cursor.DEFAULT);
-    }
-
-    // Método auxiliar para exibir os alerts. Foi criado para evitar muita repetição de código
+    // Método auxiliar para exibir os alerts. Foi criado para evitar repetição de código
 
     private void exibirAlert(Alert.AlertType alertType,String title, String cabecalho, String contentText){
         Alert alert = new Alert(alertType);
-        alert.initOwner(gridPane.getScene().getWindow());
+        alert.initOwner(root.getScene().getWindow());
         alert.setTitle(title);
         alert.setHeaderText(cabecalho);
         alert.setContentText(contentText);

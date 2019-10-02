@@ -5,47 +5,44 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXSpinner;
 import com.raphaelcollin.contatos.model.Contato;
 import com.raphaelcollin.contatos.model.ContatoDAO;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import java.awt.*;
+
 import java.io.IOException;
 import java.util.Optional;
 
 public class ControllerPrincipal {
 
+
     @FXML
-    private BorderPane borderPane;
+    private BorderPane root;
     @FXML
     private TextField textField;
     @FXML
-    private Button addButton;
+    private ImageView imageView;
     @FXML
     private JFXListView<GridPane> listView;
     @FXML
@@ -57,59 +54,83 @@ public class ControllerPrincipal {
 
         // Tamanho atual da tela
 
-    private Dimension dimension = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+    private Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
 
         // Lista de GridPanes que aparecerão na ListView
 
     private ObservableList<GridPane> gridList;
+
+        // Constantes
+
+    private static final String URL_IMAGEM_ICONE_MAIS = "file:arquivos/add-contact-icon.png";
+    private static final String URL_ARQUIVO_CONTATO_FXML = "/contato_item.fxml";
+    private static final String URL_JANELA_ADICIONAR = "/janela_adicionar.fxml";
+    private static final String URL_JANELA_DETALHES = "/janela_detalhes.fxml";
+
+    private static final String ID_IMAGEM_ADICIONAR_CONTATO = "imagem-adicionar-contato";
+    private static final String CLASS_BOTAO_EXCLUIR_CONTATO =  "botao-laranja";
+    private static final String CLASS_BOTAO_ABRIR_CONTATO =  "botao-azul";
         
     public void initialize(){
 
-            // Colocando o tamanho do Text Field principal de acordo com o tamanho da tela
+            // Padding e Margin
 
-        double width;
-        double heigth;
+        root.setPadding(new Insets(tamanhoTela.getHeight() * 0.0185,0.0,tamanhoTela.getHeight() * 0.0185,
+                0.0));
+        BorderPane.setMargin(root.getCenter(), new Insets(tamanhoTela.getHeight() * 0.0185,0.0,
+                tamanhoTela.getHeight() * 0.0185, 0.0));
 
-        width = dimension.width * 0.20;
-        heigth = dimension.height * 0.05;
+            // Alinhando e definindo tamanho de controles
 
-            // Criando efeito de sombra que será usado no textField e na listView
+        AnchorPane.setLeftAnchor(textField,tamanhoTela.getWidth() * 0.025);
+        AnchorPane.setRightAnchor(textField, tamanhoTela.getWidth() * 0.07);
+        AnchorPane.setLeftAnchor(imageView, tamanhoTela.getWidth() * 0.25);
+        AnchorPane.setTopAnchor(imageView,- tamanhoTela.getHeight() * 0.00648);
+
+        textField.setPrefWidth(tamanhoTela.getWidth() * 0.20);
+        textField.setPrefHeight(tamanhoTela.getHeight() * 0.05);
+        textField.setFont(new Font("Arial",tamanhoTela.getWidth() * 0.01145));
+
+        excluirButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
+        excluirButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        excluirButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
+
+        abrirButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
+        abrirButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        abrirButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
+
+        imageView.setImage(new Image(URL_IMAGEM_ICONE_MAIS));
+
+        imageView.setFitWidth(tamanhoTela.getHeight() * 0.068);
+        imageView.setFitHeight(tamanhoTela.getHeight() * 0.065);
+
+            // Criando efeito de sombra
 
         DropShadow dropShadow = new DropShadow(1.8, Color.GRAY);
 
-        textField.setPrefWidth(width);
-        textField.setPrefHeight(heigth);
-
         textField.setEffect(dropShadow);
+        imageView.setEffect(dropShadow);
 
-            // Colocando a imagem de dentro do Botao de acordo com o tamnho da Tela
 
-        ImageView imageView = new ImageView(new Image("file:arquivos/plus-icon.png"));
-
-        imageView.setFitWidth(heigth * 0.80);
-        imageView.setFitHeight(heigth * 0.80);
-
-        addButton.setGraphic(imageView);
-
-            // Colocando Menus de Contexto para List View
+            // Colocando ContextMenu para os items do List View
 
         listView.setOnContextMenuRequested( event -> {
             ContextMenu contextMenu = new ContextMenu();
             MenuItem editItem = new MenuItem("Abrir Contato");
             editItem.setOnAction(event2 -> abrirJanelaEditarContato());
             MenuItem deleteItem = new MenuItem("Excluir Contato");
-            deleteItem.setOnAction(event3 -> handleExcluir());
+            deleteItem.setOnAction(event3 -> handleExcluirContato());
             contextMenu.getItems().addAll(editItem, deleteItem);
-            contextMenu.show(borderPane.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+            contextMenu.show(root.getScene().getWindow(), event.getScreenX(), event.getScreenY());
         });
 
             // Sombra no listView
 
         listView.setEffect(dropShadow);
 
-            /* Configurando para que quando um item da listView, nesse caso um GridPane, estiver ativo
-               os labels do nome e do número fiquem com a cor branca
-               quando não estiverem selecionados, o nome ficará preto e o número ficar cinza */
+            /* Configurando para que quando um item da listView estiver ativo
+               os labels do nome e do número fiquem com a cor branca quando não estiverem selecionados,
+               o nome ficará preto e o número ficar cinza */
 
         listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 
@@ -126,33 +147,61 @@ public class ControllerPrincipal {
 
         });
 
+        // Difinindo Classes CSS
+
+        imageView.setId(ID_IMAGEM_ADICIONAR_CONTATO);
+        excluirButton.getStyleClass().add(CLASS_BOTAO_EXCLUIR_CONTATO);
+        abrirButton.getStyleClass().add(CLASS_BOTAO_ABRIR_CONTATO);
+
             /* Criando Thread para carregar os contatos do banco de dados. Enquanto a Task estiver sendo executada,
-            *  um progress indicator ficará aparecendo na tela. Quando a Task terminar sua execução, iremos esconder
-            *  o progress indicator e colocar a lista de contatos no lugar*/
+            *  um progress indicator ficará aparecendo na tela. Quando a Task terminar sua execução, caso tenha sido executada com sucesso,
+            *  o progressIndicator será escondido e será colocado a lista de contatos no lugar. Caso contrário, um alert será exibido
+            *  indicando erro na conexão com o Banco de Dados e aplicação será fechada */
 
         Task<ObservableList<Contato>> task = new Task<ObservableList<Contato>>() {
             @Override
             protected ObservableList<Contato> call(){
-                borderPane.setCursor(Cursor.WAIT);
-                return ContatoDAO.getInstance().selectContatos();
+                root.setCursor(Cursor.WAIT);
+                return ContatoDAO.getInstance().recuperarTodosContatos();
             }
         };
 
         task.setOnSucceeded(e -> {
 
-            borderPane.setCursor(Cursor.DEFAULT);
+            root.setCursor(Cursor.DEFAULT);
             gridList = FXCollections.observableArrayList();
             ObservableList<Contato> contatos = task.getValue();
 
-                /* Se não houver nenhum contato adicionado a lista, exibiremos um label informando isso.
-                   Caso contrário, vamos carregar os contatos */
+            if (contatos == null) {
+
+                HBox hBox = new HBox();
+                hBox.setAlignment(Pos.TOP_CENTER);
+                Label label = new Label("Erro na Conexão com o Banco de Dados");
+                label.setFont(new Font(tamanhoTela.getWidth() * 0.01354));
+                hBox.getChildren().setAll(label);
+
+                GridPane gridPane = (GridPane) root.getCenter();
+                gridPane.setVgap(tamanhoTela.getHeight() * 0.04629);
+                gridPane.getChildren().remove(spinner);
+                gridPane.getChildren().add(hBox);
+                GridPane.setConstraints(hBox,0,1,2,1);
+
+                exibirAlert(Alert.AlertType.ERROR,"Contatos","Erro no Banco de Dados",
+                        "Não foi possível se conectar ao Banco de Dados MYSQL");
+
+                Platform.exit();
+                return;
+            }
+
+                /* Se não houver nenhum contato adicionado a lista, um label será exibindo informando esse fato.
+                   Caso contrário, os contatos serão carregados */
 
             if (contatos.size() > 0){
                 for (Contato contato : contatos){
 
                         // Criando e configurando um item da lista (GridPane)
 
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/contato_item.fxml"));
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(URL_ARQUIVO_CONTATO_FXML));
                     try {
                         GridPane gridPane = fxmlLoader.load();
                         ControllerContato controllerContato = fxmlLoader.getController();
@@ -169,13 +218,13 @@ public class ControllerPrincipal {
                         gridList.add(gridPane);
 
                     } catch (IOException ex) {
-                        ex.printStackTrace();
+                        System.err.println("Erro: " + ex.getMessage());
                     }
                 }
 
                     /* Criando filtro para lista de contatos. Caso o textField esteja vazio ou o conteúdo do textField
-                       não corresponder a nenhum contato da lista, iremos exibir todos os contatos. Caso contrário,
-                       exibiremos apenas os contatos cujo o nome contém a string contida no textField */
+                       não corresponder a nenhum contato da lista, serão exibir todos os contatos. Caso contrário,
+                       apenas os contatos cujo o nome contém a string contida no textField será exibido */
 
                 FilteredList<GridPane> filteredList = new FilteredList<>(gridList,p -> true);
 
@@ -185,7 +234,8 @@ public class ControllerPrincipal {
                     } else {
                         if (newValue != null){
                             filteredList.setPredicate(gridPane -> {
-                                String nome = ((Label) ((VBox) gridPane.getChildren().get(1)).getChildren().get(1)).getText();
+                                String nome = ((Label) ((VBox) gridPane.getChildren().
+                                        get(1)).getChildren().get(1)).getText();
                                 return nome.toLowerCase().contains(newValue.toLowerCase());
                             });
                         }
@@ -208,16 +258,16 @@ public class ControllerPrincipal {
                 listView.setVisible(true);
 
 
-            } else {
+            } else { // Caso em que a lista de Contatos está vazia
 
                 Label label = new Label("Nenhum contato foi adicionado");
-                label.setFont(new Font(20));
+                label.setFont(new Font(tamanhoTela.getWidth() * 0.01354));
 
                 HBox hBox = new HBox();
                 hBox.setAlignment(Pos.CENTER);
                 hBox.getChildren().add(label);
 
-                ((GridPane) borderPane.getCenter()).getChildren().add(hBox);
+                ((GridPane) root.getCenter()).getChildren().add(hBox);
                 GridPane.setConstraints(hBox,0,1,2,1);
             }
 
@@ -232,35 +282,25 @@ public class ControllerPrincipal {
 
         new Thread(task).start();
 
-            // Configurando as dimensões e o tamanho da fonte dos botões abrir e excluir contato
-
-        excluirButton.setPrefWidth(dimension.width * 0.3 / 2 - 54);
-        excluirButton.setFont(new Font(dimension.width * 0.012));
-        excluirButton.setPrefHeight(40);
-        abrirButton.setPrefWidth(dimension.width * 0.3 / 2 - 54);
-        abrirButton.setFont(new Font(dimension.width * 0.012));
-        abrirButton.setPrefHeight(40);
-
         
     }
 
-        // Quando o botao Adicionar for acionado vamos carregar a outra janela com o mesmo tamanho da atual para o
-        // usuario adiconar seu contato
+        // Quando o botao Adicionar for acionado a janela para adição de umo novo contato será carregada
 
     @FXML
-    public void handleButton() {
-        Stage stage = (Stage) borderPane.getScene().getWindow();
+    public void handleAdicionarContato() {
+        Stage stage = (Stage) root.getScene().getWindow();
         try {
-            Parent adiconarJanela = FXMLLoader.load(getClass().getResource("/janela_adicionar.fxml"));
-            stage.setScene(new Scene(adiconarJanela, dimension.width * 0.3, dimension.height * 0.6));
+            Parent adiconarJanela = FXMLLoader.load(getClass().getResource(URL_JANELA_ADICIONAR));
+            stage.getScene().setRoot(adiconarJanela);
         } catch (IOException e){
             System.out.println("Erro: " + e.getMessage());
         }
 
     }
 
-        // Se o usuario der dois cliques em cima de um item da lista, vamos executar o metodo abrirJanelaEditarContato()
-        // que ira abrir uma nova janela que sera possivel que o usuario veja informacoes do contato selecionado
+        /* Se o usuário der dois cliques em cima de um item da lista, será executado o método abrirJanelaEditarContato()
+           que irá carregar uma janela na qual será possível que o usuário veja informações do contato selecionado */
 
     @FXML
     public void handleListDoubleClick(MouseEvent event){
@@ -269,8 +309,8 @@ public class ControllerPrincipal {
         }
     }
 
-        // Se o usuario acionar o botao abrir contato, vamos executar o metodo abrirJanelaEditarContato()
-        // que ira abrir uma nova janela que sera possivel que o usuario veja informacoes do contato selecionado
+        /* Se o usuário acionar o botao abrir contato, será executado o método abrirJanelaEditarContato()
+           que irá carregar uma janela na qual será possível que o usuário veja informações do contato selecionado */
 
     @FXML
     public void handleAbrirContato(){
@@ -278,13 +318,13 @@ public class ControllerPrincipal {
     }
 
         /*
-        * Quando o usuario acionar o botao Excluir Contato, sera exibido um alert de confirmacao,
-        * Se o usuario confirmar a operacao, vamos tentar excluir o contato do banco, se a operacao for realizado
-        * com sucesso, vamos exibir uma mensagem de sucesso e se ocorrer algum erro, vamos exibir uma mensagem de erro
+        * Quando o usuário acionar o botão Excluir Contato, será exibido um alert de confirmação,
+        * Se o usuário confirmar a operação, será feita uma tentativa de exclusão do contato no banco de dados, se a tentativa obtiver
+        * sucesso, será exibida uma mensagem de sucesso e se ocorrer algum erro, vamos exibir uma mensagem de erro
         * */
 
     @FXML
-    public void handleExcluir(){
+    public void handleExcluirContato(){
 
         // Obtendo elemento selecionado
 
@@ -308,7 +348,7 @@ public class ControllerPrincipal {
                 Task<Boolean> task = new Task<Boolean>() {
                     @Override
                     protected Boolean call() {
-                        return ContatoDAO.getInstance().deleteContato(intId);
+                        return ContatoDAO.getInstance().excluirContato(intId);
                     }
                 };
 
@@ -331,8 +371,8 @@ public class ControllerPrincipal {
 
     }
 
-        /* Quando esse metodo for chamado, vamos carregar outra janela onde sera possivel o usuario ver as informacoes
-         * do usuario selecionado */
+        /* Quando esse metodo for chamado, será carregada outra janela onde sera possível visualizar informações
+         * do usuário selecionado */
 
     private void abrirJanelaEditarContato(){
 
@@ -354,10 +394,10 @@ public class ControllerPrincipal {
 
             Contato contato = new Contato(intId,nome,sexo,numero,email,descricao);
 
-            Stage stage = (Stage) borderPane.getScene().getWindow();
+            Stage stage = (Stage) root.getScene().getWindow();
             FXMLLoader fxmlLoader;
             try {
-                fxmlLoader = new FXMLLoader(getClass().getResource("/janela_detalhes.fxml"));
+                fxmlLoader = new FXMLLoader(getClass().getResource(URL_JANELA_DETALHES));
                 GridPane root = fxmlLoader.load();
 
                 ControllerDetalhes controllerDetalhes = fxmlLoader.getController();
@@ -367,12 +407,7 @@ public class ControllerPrincipal {
 
                 controllerDetalhes.inicializarCampos();
 
-                Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-
-                double width = screenSize.width * 0.3;
-                double heigth = screenSize.height * 0.6;
-
-                stage.setScene(new Scene(root,width,heigth));
+                stage.getScene().setRoot(root);
 
             } catch (IOException e){
                 System.out.println("Erro: " + e.getMessage());
@@ -381,38 +416,24 @@ public class ControllerPrincipal {
 
     }
 
-    // Se o usuario apertar a tecla Delete do teclado, vamos executar o metodo para excluir o contato
-    // Se o usuario apertar a tecla Enter do teclado, vamos executar o metodo para abrir o contato
+    // Se o usuário apertar a tecla Delete do teclado, será executado o método para excluir o contato
+    // Se o usuário apertar a tecla Enter do teclado, será executado o método para abrir o contato
 
     @FXML
     public void handleKeyPressed(KeyEvent event) {
         if (event.getCode().equals(KeyCode.DELETE)){
-            handleExcluir();
+            handleExcluirContato();
         }
         if(event.getCode().equals(KeyCode.ENTER)){
             handleAbrirContato();
         }
     }
 
-    // Quando o cursor mouse estiver sobre algum botão, iremos colocar trocar o cursor
-
-    @FXML
-    public void handleMouseEntered() {
-        borderPane.setCursor(Cursor.HAND);
-    }
-
-    // Quando o cursor do mouse sair de cima de algum botão, iremos voltar o cursor para o normal
-
-    @FXML
-    public void handleMouseExited() {
-        borderPane.setCursor(Cursor.DEFAULT);
-    }
-
-    // Método auxiliar para exibir os alerts. Foi criado para evitar muita repetição de código
+    // Método auxiliar para exibir os alerts. Foi criado para evitar repetição de código
 
     private Optional<ButtonType> exibirAlert(Alert.AlertType type, String title, String headerText, String contentText){
         Alert alert = new Alert(type);
-        alert.initOwner(borderPane.getScene().getWindow());
+        alert.initOwner(root.getScene().getWindow());
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);

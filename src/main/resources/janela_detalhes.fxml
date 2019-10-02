@@ -2,26 +2,15 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.TextArea?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.control.Label?>
-<?import javafx.geometry.Insets?>
-<?import java.net.URL?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.control.TextField?>
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXRadioButton?>
 <?import javafx.scene.control.ToggleGroup?>
 
-<GridPane fx:id="gridPane" xmlns:fx="http://javafx.com/fxml"
-          fx:controller="com.raphaelcollin.contatos.controller.ControllerDetalhes" vgap="20" hgap="10"
-          alignment="TOP_CENTER">
-
-    <padding>
-        <Insets top="20" bottom="20" right="50" left="50"/>
-    </padding>
-    <stylesheets> <!-- Inclusao do CSS -->
-        <URL value="@estilo.css"/>
-    </stylesheets>
+<GridPane fx:id="root" xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.raphaelcollin.contatos.controller.ControllerDetalhes" alignment="TOP_CENTER">
 
     <!-- Imagem -->
 
@@ -32,27 +21,14 @@
 
     <!-- Nome -->
 
-    <Label text="Nome:" fx:id="labelNome" onMouseClicked="#handleLabelClick"  GridPane.rowIndex="1"
-           GridPane.columnIndex="0">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </Label>
+    <Label text="Nome:" fx:id="nomeLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="1"
+           GridPane.columnIndex="0"/>
 
-    <TextField promptText="Nome do Contato" fx:id="nomeField" styleClass="adicionar-field"
-               GridPane.rowIndex="1" GridPane.columnIndex="1">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </TextField>
+    <TextField promptText="Nome do Contato" fx:id="nomeField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
     <!-- Sexo -->
 
-    <Label text="Sexo:" GridPane.rowIndex="2" GridPane.columnIndex="0">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </Label>
+    <Label text="Sexo:" fx:id="sexoLabel" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
     <fx:define>
         <ToggleGroup fx:id="radioGroup"/>
@@ -60,84 +36,43 @@
 
     <!-- Radio Buttons -->
 
-    <HBox spacing="10" GridPane.rowIndex="2" GridPane.columnIndex="1">
-        <JFXRadioButton text="Masculino" selected="true" toggleGroup="$radioGroup">
-            <font>
-                <Font name="Arial" size="20"/>
-            </font>
-        </JFXRadioButton>
-        <JFXRadioButton fx:id="femininoRadio" toggleGroup="$radioGroup" text="Feminino">
-            <font>
-                <Font name="Arial" size="20"/>
-            </font>
-        </JFXRadioButton>
+    <HBox fx:id="hBoxRadio" GridPane.rowIndex="2" GridPane.columnIndex="1">
+        <JFXRadioButton text="Masculino" fx:id="masculinoRadio" selected="true" toggleGroup="$radioGroup"/>
+        <JFXRadioButton text="Feminino" fx:id="femininoRadio" toggleGroup="$radioGroup"/>
     </HBox>
-
 
 
     <!-- Numero -->
 
-    <Label text="Número:" fx:id="labelNumero" onMouseClicked="#handleLabelClick" GridPane.rowIndex="3"
-           GridPane.columnIndex="0">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </Label>
+    <Label text="Número:" fx:id="numeroLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="3"
+           GridPane.columnIndex="0"/>
 
-    <TextField promptText="Número do Contato" fx:id="numeroField" styleClass="adicionar-field" GridPane.rowIndex="3"
-               GridPane.columnIndex="1">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </TextField>
+    <TextField promptText="Número do Contato" fx:id="numeroField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
     <!-- E-mail -->
 
-    <Label text="E-mail:" fx:id="labelEmail" onMouseClicked="#handleLabelClick"  GridPane.rowIndex="4"
-           GridPane.columnIndex="0">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </Label>
+    <Label text="E-mail:" fx:id="emailLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="4"
+           GridPane.columnIndex="0"/>
 
-    <TextField promptText="exemplo@exemplo.com" fx:id="emailField" styleClass="adicionar-field" GridPane.rowIndex="4"
-               GridPane.columnIndex="1">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </TextField>
+    <TextField promptText="exemplo@exemplo.com" fx:id="emailField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-    <!-- Descricao -->
+    <!-- Descrição -->
 
-    <Label text="Descrição: (Opcional)" fx:id="labelDescricao" GridPane.rowIndex="5" GridPane.columnIndex="0"
-           GridPane.columnSpan="2">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </Label>
+    <Label text="Descrição: (Opcional)" fx:id="descricaoLabel" GridPane.rowIndex="5" GridPane.columnIndex="0"
+           GridPane.columnSpan="2"/>
 
     <TextArea promptText="Descreva o Contato"  wrapText="true" fx:id="descricaoField" GridPane.rowIndex="6"
-              GridPane.columnIndex="0" GridPane.columnSpan="2">
-        <font>
-            <Font name="Arial" size="24"/>
-        </font>
-    </TextArea>
+              GridPane.columnIndex="0" GridPane.columnSpan="2"/>
 
-    <!-- Botoes -->
+    <!-- Botões -->
 
     <GridPane alignment="CENTER" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.columnSpan="2">
 
-        <JFXButton text="Voltar" fx:id="voltarButton" styleClass="orange-button" onAction="#handleVoltar"
-                   onMouseEntered="#handleMouseEntered" onMouseExited="#handleMouseExited"
+        <JFXButton text="Voltar" fx:id="voltarButton" onAction="#handleVoltar"
                    GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
-        <JFXButton text="Salvar" fx:id="salvarButton" disable="true" defaultButton="true" styleClass="blue-button"
-                   onAction="#handleSalvar" onMouseEntered="#handleMouseEntered" onMouseExited="#handleMouseExited"
-                   GridPane.rowIndex="0" GridPane.columnIndex="1"  />
-
-        <BorderPane.margin>
-            <Insets top="20"/>
-        </BorderPane.margin>
+        <JFXButton text="Salvar" fx:id="salvarButton" disable="true" defaultButton="true"
+                   onAction="#handleSalvar" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
     </GridPane>
 

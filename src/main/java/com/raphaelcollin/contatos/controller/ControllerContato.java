@@ -1,14 +1,17 @@
 package com.raphaelcollin.contatos.controller;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-
-import java.awt.*;
+import javafx.stage.Screen;
 
 public class ControllerContato {
+    @FXML
+    private GridPane root;
     @FXML
     private ImageView imageView;
     @FXML
@@ -24,12 +27,18 @@ public class ControllerContato {
     @FXML
     private Label descricaoField;
 
+    private static final String URL_IMAGEM_ICONE_MASCULINO = "file:arquivos/male-icon.png";
+    private static final String URL_IMAGEM_ICONE_FEMININO = "file:arquivos/female-icon.png";
+
 
     public void initialize(){
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
 
-        nomeField.setFont(new Font(dimension.width * 0.012));
-        numeroField.setFont(new Font(dimension.width * 0.012));
+        root.setVgap(-tamanhoTela.getHeight() * 0.018518);
+        root.setHgap(tamanhoTela.getWidth() * 0.010416);
+
+        nomeField.setFont(new Font(tamanhoTela.getWidth()* 0.012));
+        numeroField.setFont(new Font(tamanhoTela.getWidth() * 0.012));
 
     }
 
@@ -60,9 +69,9 @@ public class ControllerContato {
 
     void setImage() {
         if (sexoField.getText().equalsIgnoreCase("Masculino")){
-            imageView.setImage(new Image("file:arquivos/male-icon.png"));
+            imageView.setImage(new Image(URL_IMAGEM_ICONE_MASCULINO));
         } else {
-            imageView.setImage(new Image("file:arquivos/female-icon.png"));
+            imageView.setImage(new Image(URL_IMAGEM_ICONE_FEMININO));
         }
     }
 

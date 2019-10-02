@@ -5,7 +5,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.text.Font?>
 
-<GridPane xmlns:fx="http://javafx.com/fxml" hgap="20" vgap="-20"
+<GridPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
           fx:controller="com.raphaelcollin.contatos.controller.ControllerContato">
 
     <ImageView fx:id="imageView" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="0"/>
@@ -16,13 +16,13 @@
                 <Font size="1"/>
             </font>
         </Label>
-        <Label style="-fx-text-fill: #333333" fx:id="nomeField"/>
+        <Label fx:id="nomeField" style="-fx-text-fill: #333333"/>
         <Label fx:id="sexoField" visible="false">
             <font>
                 <Font size="1"/>
             </font>
         </Label>
-        <Label style="-fx-text-fill: #7a7a7a" fx:id="numeroField"/>
+        <Label fx:id="numeroField" style="-fx-text-fill: #7a7a7a"/>
         <Label fx:id="emailField" visible="false">
             <font>
                 <Font size="1"/>

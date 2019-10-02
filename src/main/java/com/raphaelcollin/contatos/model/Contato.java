@@ -3,7 +3,7 @@ package com.raphaelcollin.contatos.model;
 
 public class Contato {
     
-        // A descricao sera opcional
+        // A descrição será opcional
 
     private int id = -1;
     private String nome;

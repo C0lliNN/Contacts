@@ -7,22 +7,22 @@ import com.raphaelcollin.contatos.model.ContatoDAO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
-import java.awt.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,21 +31,27 @@ import java.util.List;
 public class ControllerDetalhes {
 
     @FXML
-    private GridPane gridPane;
+    private GridPane root;
     @FXML
     private ImageView imageView;
     @FXML
-    private Label labelNome;
+    private Label nomeLabel;
+    @FXML
+    private Label sexoLabel;
     @FXML
     private ToggleGroup radioGroup;
     @FXML
+    private HBox hBoxRadio;
+    @FXML
+    private JFXRadioButton masculinoRadio;
+    @FXML
     private JFXRadioButton femininoRadio;
     @FXML
-    private Label labelNumero;
+    private Label numeroLabel;
     @FXML
-    private Label labelEmail;
+    private Label emailLabel;
     @FXML
-    private Label labelDescricao;
+    private Label descricaoLabel;
     @FXML
     private TextField nomeField;
     @FXML
@@ -59,42 +65,100 @@ public class ControllerDetalhes {
     @FXML
     private JFXButton salvarButton;
 
-        // Contato que sera visto seus detalhes
+        // Contato que está sendo visualizado
 
     private Contato contato;
 
-        // Maximo de Caracteres para o campo descricao
+    // Tamanho atual da tela
 
-    private static final int MAX_TEXTAREA_LENGTH = 245;
+    private Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
+
+    /* Constantes */
+
+    private static final int MAX_TEXTAREA_LENGTH = 245; // Maximo de Caracteres para o campo descricao
 
     // Regex de validação do campo email
-
     private static final String EMAIL_REG_EXP = "(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
 
     // Regex de validação do campo número
-
     private static final String NUM_REG_EXP = "\\d{8,12}";
+
+    private static final String URL_IMAGEM_ICONE = "file:arquivos/person-icon.png";
+    private static final String CLASSE_BOTAO_VOLTAR =  "botao-laranja";
+    private static final String CLASSE_BOTAO_SALVAR =  "botao-azul";
+    private static final String CLASSE_FIELD = "adicionar-field";
+    private static final String CLASSE_BORDA_VERMELHA = "borda-vermelha";
+    private static final String URL_JANELA_PRINCIPAL = "/janela_principal.fxml";
+
+    // Constantes relativas a estrutura do Banco de Dados
+
+    private static final String TABELA_CONTATOS_DB = "contatos";
+    private static final String COLUNA_IDCONTATO_DB = "idContato";
+    private static final String COLUNA_NOME_DB = "nome";
+    private static final String COLUNA_SEXO_DB = "sexo";
+    private static final String COLUNA_NUMERO_DB = "numero";
+    private static final String COLUNA_EMAIL_DB = "email";
+    private static final String COLUNA_DESCRICAO_DB = "descricao";
 
     public void initialize(){
 
-            // Imagem
+        // Padding, Gaps e Spacing
 
-        imageView.setImage(new Image("file:arquivos/person-icon.png"));
+        root.setPadding(new Insets(tamanhoTela.getHeight() * 0.018518, tamanhoTela.getWidth() * 0.026041,
+                tamanhoTela.getHeight() * 0.018518, tamanhoTela.getWidth() * 0.026041));
+        root.setHgap(tamanhoTela.getWidth() * 0.0052083);
+        root.setVgap(tamanhoTela.getHeight() * 0.018518);
+        hBoxRadio.setSpacing(tamanhoTela.getWidth() * 0.0052083);
 
-        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+        // Alinhando e definindo tamanho de controles
 
-        imageView.setFitWidth(dimension.width * 0.06);
-        imageView.setFitHeight(dimension.width * 0.06);
+        imageView.setImage(new Image(URL_IMAGEM_ICONE));
+        imageView.setFitWidth(tamanhoTela.getWidth() * 0.06);
+        imageView.setFitHeight(tamanhoTela.getWidth()* 0.06);
 
-            // Colocando Labels para os Campos
+        voltarButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
+        voltarButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        voltarButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
 
-        labelNome.setLabelFor(nomeField);
-        labelNumero.setLabelFor(numeroField);
-        labelEmail.setLabelFor(emailField);
-        labelDescricao.setLabelFor(descricaoField);
-        labelDescricao.setOnMouseClicked( event -> descricaoField.requestFocus());
+        salvarButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
+        salvarButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        salvarButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
 
-        // Criando efeito de sombra externa que será usado nos campos
+        // Definindo Tamanho das Fontes
+
+        double tamanhoFonte = tamanhoTela.getWidth() * 0.01145;
+
+        nomeLabel.setFont(new Font(tamanhoFonte));
+        nomeField.setFont(new Font(tamanhoFonte));
+        sexoLabel.setFont(new Font(tamanhoFonte));
+        masculinoRadio.setFont(new Font(tamanhoFonte));
+        femininoRadio.setFont(new Font(tamanhoFonte));
+        numeroLabel.setFont(new Font(tamanhoFonte));
+        numeroField.setFont(new Font(tamanhoFonte));
+        emailLabel.setFont(new Font(tamanhoFonte));
+        emailField.setFont(new Font(tamanhoFonte));
+        descricaoLabel.setFont(new Font(tamanhoFonte));
+        descricaoField.setFont(new Font(tamanhoFonte));
+
+        // CSS
+
+        voltarButton.getStyleClass().add(CLASSE_BOTAO_VOLTAR);
+        salvarButton.getStyleClass().add(CLASSE_BOTAO_SALVAR);
+        nomeField.getStyleClass().add(CLASSE_FIELD);
+        numeroField.getStyleClass().add(CLASSE_FIELD);
+        emailField.getStyleClass().add(CLASSE_FIELD);
+        descricaoField.getStyleClass().add(CLASSE_FIELD);
+
+
+        // Colocando Labels para os Campos
+
+        nomeLabel.setLabelFor(nomeField);
+        numeroLabel.setLabelFor(numeroField);
+        emailLabel.setLabelFor(emailField);
+        descricaoLabel.setLabelFor(descricaoField);
+        descricaoLabel.setOnMouseClicked(event -> descricaoField.requestFocus());
+
+        // Criando efeito de sombra externa que será usado nos controles abaixo
 
         DropShadow dropShadow = new DropShadow(1.8, Color.GRAY);
 
@@ -102,10 +166,11 @@ public class ControllerDetalhes {
         numeroField.setEffect(dropShadow);
         emailField.setEffect(dropShadow);
         descricaoField.setEffect(dropShadow);
+        imageView.setEffect(dropShadow);
 
         /* Caso o texto de algum dos campos for alterado, o botão salvar será habilitando, indicando ao usuário que
-           as mudanças precisam ser salvas. Nos campos número e email, quando o foco sair desses campos iremos
-           verificar se eles são válidos usando suas respectivas regex. Se o campo for inválido iremos colocar uma
+           as mudanças precisam ser salvas. Nos campos número e email, quando o foco sair desses campos será verificado
+           se eles são válidos usando suas respectivas regex. Se o campo for inválido será colocada uma
            borda vermelha, indicando para o usuário que o input é inválido */
 
         nomeField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -128,11 +193,11 @@ public class ControllerDetalhes {
 
         numeroField.focusedProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue) {
-                numeroField.getStyleClass().remove("borda-vermelha");
+                numeroField.getStyleClass().remove(CLASSE_BORDA_VERMELHA);
             }
             if (oldValue){
                 if (!numeroField.getText().isEmpty() && !numeroField.getText().matches(NUM_REG_EXP)){
-                    numeroField.getStyleClass().add("borda-vermelha");
+                    numeroField.getStyleClass().add(CLASSE_BORDA_VERMELHA);
                 }
             }
         }));
@@ -145,17 +210,17 @@ public class ControllerDetalhes {
 
         emailField.focusedProperty().addListener( (observable, oldValue, newValue) -> {
             if (newValue){
-                emailField.getStyleClass().remove("borda-vermelha");
+                emailField.getStyleClass().remove(CLASSE_BORDA_VERMELHA);
             }
 
             if (oldValue) {
                 if(!emailField.getText().isEmpty() && !emailField.getText().matches(EMAIL_REG_EXP)){
-                    emailField.getStyleClass().add("borda-vermelha");
+                    emailField.getStyleClass().add(CLASSE_BORDA_VERMELHA);
                 }
             }
         });
 
-            // Controlando o maximo de caracters do text Area descicao
+            // Controlando o máximo de caracteres do textArea descrição
 
         descricaoField.textProperty().addListener( (observable, oldValue, newValue) -> {
             if (salvarButton.isDisable()){
@@ -167,30 +232,22 @@ public class ControllerDetalhes {
             }
         });
 
-            // Configurando as dimensões e o tamanho da fonte dos botões salvar e voltar
-
-        voltarButton.setPrefWidth(dimension.width * 0.3 / 2 - 54);
-        voltarButton.setFont(new javafx.scene.text.Font(dimension.width * 0.012));
-        voltarButton.setPrefHeight(40);
-        salvarButton.setPrefWidth(dimension.width * 0.3 / 2 - 54);
-        salvarButton.setFont(new Font(dimension.width * 0.012));
-        salvarButton.setPrefHeight(40);
     }
 
     /*
-     * Esse metodo sera executado quando o Botao Salvar for acionado
-     * Primeiramente, vamos verfificar se os campos nao estao vazios e se possuem valores validos.
+     * Este método será executado quando o Botão Salvar for acionado
+     * Primeiramente, será verfificado se os campos não estão vazios e se possuem valores válidos.
      *
-     * Se os campos nao possuirem valores validos, vamos exibir um alert informando o erro
-     * Se os campos forem validos, vamos verificar quais campos foram alterados pelo usuarios para poder montar a query
+     * Se os campos não possuírem valores validos, será exibido um alert informando o erro
+     * Se os campos forem válidos, será verificado quais campos foram alterados pelo usuarios para poder montar a query
      * corretamente.
      *
-     * Se nenhum campos for alterado, vamos simplesmente desabilitar o botão salvar e não fazer mais nada
+     * Se nenhum campos for alterado, será simplesmente desabilitado o botão salvar e não será feito mais nada
      *
-     * Nesse processo podem acontecer erros como: usuario trocar o nome para um nome que ja esteja cadastrado, etc...
+     * Nesse processo podem acontecer erros como: usuário trocar o nome para um nome que já esteja cadastrado, etc...
      *
-     * Se a query for executada com sucesso no banco, vamos exibir um altert de confirmacao
-     * Se não vamos exibir uma mensagem de erro
+     * Se a query for executada com sucesso no banco, será exibido um alert informando o sucesso da atualização
+     * Se não será exibida uma mensagem de erro
      * */
 
 
@@ -216,36 +273,37 @@ public class ControllerDetalhes {
 
             // Objeto que será usado para construir a query
 
-            StringBuilder sql = new StringBuilder("update contatos ");
+            StringBuilder query = new StringBuilder("update ");
+            query.append(TABELA_CONTATOS_DB);
 
             List<String> campos = new ArrayList<>();
 
             int count = 0;
 
 
-                /* Se a condicao abaixo for verdadeira, significa que algum campo foi alterado, ou seja o contato
-                    foi alterado, entao a atualizacao no banco precisa ser feita, se a condicao for falsa, ou seja,
-                    nenhum campo foi alterada, vamos apenas desabilitar o botão salvar*/
+                /* Se a condição abaixo for verdadeira, significa que algum campo foi alterado, ou seja o contato
+                    foi alterado, então a atualização no banco precisa ser feita, se a condição for falsa, ou seja,
+                    nenhum campo foi alterado, será apenas desabilitado o botão salvar*/
 
             if (!(nomeField.getText().equals(contato.getNome()) && numeroField.getText().equals(contato.getNumero())
                     && emailField.getText().equals(contato.getEmail()) && ((contato.getDescricao() != null && descricaoField.getText().isEmpty())
                     || (contato.getDescricao() != null && descricaoField.getText().equals(contato.getDescricao()))))) {
 
-                /* Estou usando o caracter especial ? ao invés de concatenar diretamente a string para eveitar ataques
-                 * SQLInjection */
+                /* Está sendo usado o caracter especial ? ao invés de concatenar diretamente a string para
+                   evitar ataques SQLInjection */
 
                 if (!nomeField.getText().equals(contato.getNome())){
-                    sql.append("set nome = ?");
+                    query.append(" set ").append(COLUNA_NOME_DB).append(" = ?");
                     campos.add(nomeField.getText());
                     count++;
                 }
 
                 if (!((RadioButton) radioGroup.getSelectedToggle()).getText().equals(contato.getSexo())){
                     if (count == 1) {
-                        sql.append(", ");
-                        sql.append("sexo = ?");
+                        query.append(", ");
+                        query.append(COLUNA_SEXO_DB).append(" = ?");
                     } else {
-                        sql.append("set sexo = ?");
+                        query.append(" set ").append(COLUNA_SEXO_DB).append(" = ?");
                     }
 
                     campos.add(((RadioButton) radioGroup.getSelectedToggle()).getText());
@@ -254,10 +312,10 @@ public class ControllerDetalhes {
 
                 if (!numeroField.getText().equals(contato.getNumero())){
                     if (count >= 1) {
-                        sql.append(", ");
-                        sql.append("numero = ?");
+                        query.append(", ");
+                        query.append(COLUNA_NUMERO_DB).append(" = ?");
                     } else {
-                        sql.append("set numero = ?");
+                        query.append(" set ").append(COLUNA_NUMERO_DB).append(" = ?");
                     }
 
                     campos.add(numeroField.getText());
@@ -266,10 +324,10 @@ public class ControllerDetalhes {
 
                 if (!emailField.getText().equals(contato.getEmail())){
                     if (count >= 1) {
-                        sql.append(", ");
-                        sql.append("email = ?");
+                        query.append(", ");
+                        query.append(COLUNA_EMAIL_DB).append(" = ?");
                     } else {
-                        sql.append("set email = ?");
+                        query.append(" set ").append(COLUNA_EMAIL_DB).append(" = ?");
                     }
                     campos.add(emailField.getText());
                     count++;
@@ -278,33 +336,33 @@ public class ControllerDetalhes {
                 if ((contato.getDescricao() == null && !descricaoField.getText().trim().isEmpty()) || (contato.getDescricao() != null
                         && !descricaoField.getText().equals(contato.getDescricao()))) {
                     if (count >= 1) {
-                        sql.append(", ");
-                        sql.append("descricao = ?");
+                        query.append(", ");
+                        query.append(COLUNA_DESCRICAO_DB).append(" = ?");
                     } else {
-                        sql.append("set descricao = ?");
+                        query.append(" set ").append(COLUNA_DESCRICAO_DB).append(" = ?");
                     }
 
                     campos.add(descricaoField.getText());
                 }
 
-                sql.append(" where idContato = ?");
+                query.append(" where ").append(COLUNA_IDCONTATO_DB).append(" = ?");
 
                 Task<Boolean> task = new Task<Boolean>() {
                     @Override
                     protected Boolean call(){
-                        gridPane.setCursor(Cursor.WAIT);
-                        return ContatoDAO.getInstance().updateContato(sql.toString(),campos,contato.getId());
+                        root.setCursor(Cursor.WAIT);
+                        return ContatoDAO.getInstance().atualizarContato(query.toString(),campos,contato.getId());
                     }
                 };
 
                 task.setOnSucceeded(e -> {
-                    gridPane.setCursor(Cursor.DEFAULT);
+                    root.setCursor(Cursor.DEFAULT);
                     if (task.getValue()) {
                         exibirAlert(Alert.AlertType.INFORMATION,"Processamento Realizado",
                                 "Contato atualizado com sucesso","O contato foi atualizado e já " +
                                         "está disponível na lista de contatos!");
 
-                        contato = ContatoDAO.getInstance().selectContato(contato.getId());
+                        contato = ContatoDAO.getInstance().recuperarContato(contato.getId());
                         inicializarCampos();
 
                     } else {
@@ -314,7 +372,7 @@ public class ControllerDetalhes {
                     }
                 });
 
-                // Executando acesso ao bando de dados em outra query
+                // Executando acesso ao bando de dados em outra Thread
 
                 new Thread(task).start();
 
@@ -322,7 +380,7 @@ public class ControllerDetalhes {
                 salvarButton.setDisable(true);
             }
 
-        } else {
+        } else { // Algum Campo está vazio
 
             exibirAlert(Alert.AlertType.ERROR,"Erro no processamento","Campo inválido",erro);
 
@@ -332,25 +390,22 @@ public class ControllerDetalhes {
     }
 
 
-        /* Esse metodo sera executado quando o botao voltar for acionado
-         * Quando isso acontercer, vamos carregar a pagina principal da aplicaco
-          * com a largura sendo igual a 30% da altura total da tela
-          * e a altura sendo igual a 60% da altura total da tela*/
+        /* Este método será executado quando o botão voltar for acionado.
+         * Quando isso acontecer, será carregada a janela principal da aplicação */
 
     @FXML
     public void handleVoltar() {
-        Stage stage = (Stage) gridPane.getScene().getWindow();
+        Stage stage = (Stage) root.getScene().getWindow();
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/janela_principal.fxml"));
-            Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-            stage.setScene(new Scene(root,screenSize.width * 0.3,screenSize.height * 0.6));
+            Parent root = FXMLLoader.load(getClass().getResource(URL_JANELA_PRINCIPAL));
+            stage.getScene().setRoot(root);
         } catch (IOException e){
             System.out.println("Erro: " + e.getMessage());
         }
 
     }
 
-        // Quando um Label for clicado, vamos dar foco para o seu respectivo campo
+        // Quando um Label sofrer um click, será dado foco para o seu respectivo campo
 
     @FXML
     public void handleLabelClick(MouseEvent mouseEvent) {
@@ -359,21 +414,7 @@ public class ControllerDetalhes {
         textField.requestFocus();
     }
 
-    // Quando o cursor mouse estiver sobre algum botão, iremos colocar trocar o cursor
-
-    @FXML
-    public void handleMouseEntered() {
-        gridPane.setCursor(Cursor.HAND);
-    }
-
-    // Quando o cursor do mouse sair de cima de algum botão, iremos voltar o cursor para o normal
-
-    @FXML
-    public void handleMouseExited() {
-        gridPane.setCursor(Cursor.DEFAULT);
-    }
-
-        // Inicializacao de Campos de acordo com o contato selecionado pelo usuario na Janela principal
+        // Inicialização de Campos de acordo com o contato selecionado pelo usuário na Janela principal
 
     void inicializarCampos(){
 
@@ -391,17 +432,19 @@ public class ControllerDetalhes {
         salvarButton.setDisable(true);
     }
 
-    // Método auxiliar para exibir os alerts. Foi criado para evitar muita repetição de código
+    // Método auxiliar para exibir os alerts. Foi criado para evitar repetição de código
 
     private void exibirAlert(Alert.AlertType alertType, String title, String headerText, String contentText){
         Alert alert = new Alert(alertType);
-        alert.initOwner(gridPane.getScene().getWindow());
+        alert.initOwner(root.getScene().getWindow());
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
         alert.show();
 
     }
+
+    // Setter
 
     void setContato(Contato contato) {
         this.contato = contato;

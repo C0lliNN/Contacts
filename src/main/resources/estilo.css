@@ -5,29 +5,39 @@
     -fx-background-color: #fcfcfc;
 }
 
-        /* Configuracao dos Botoes Abrir Contato, Adicionar Contato e Editar */
+.jfx-button:hover, #imagem-adicionar-contato:hover {
+    -fx-cursor: hand;
+}
 
-.blue-button {
+/* Configuração dos Botões Abrir Contato, Adicionar Contato e Editar */
+
+.botao-azul {
      -jfx-button-type: RAISED;
      -fx-background-color: #5164ae;
      -fx-text-fill: white;
      -fx-background-radius: 0;
 }
 
-.orange-button {
+/* Configuração dos Botões Excluir Contato e voltar*/
+
+.botao-laranja {
      -jfx-button-type: RAISED;
      -fx-background-color: #ff7f02;
      -fx-text-fill: white;
      -fx-background-radius: 0;
 }
 
-    /* botão adicionar contato */
+/* Configuração do Ícone de Adicionar Contato da Janela Principal */
 
-.add-button {
+#imagem-adicionar-contato {
     -fx-background-color: #00ff2e;
+    -fx-background-radius: 100%;
+    -fx-border: 0;
+
+    -fx-text-alignment: CENTER;
 }
 
-    /* Configurando fields */
+    /* Configuração dos Fields */
 
 .text-field, .text-area {
     -fx-background-insets: 0;
@@ -40,19 +50,17 @@
     -fx-faint-focus-color: transparent;
     -fx-prompt-text-fill: derive(-fx-control-inner-background,-30%);
 }
-    /* Essa classe sera adicionada quando algum campo for invalido */
+    /* Essa classe será adicionada quando algum campo for inválido */
 
 .borda-vermelha {
     -fx-border-color: red;
 }
 
-    /* Configuracoes da List View */
+    /* Configurações da List View */
 
 .jfx-list-view {
     -fx-background-insets: 0;
     -jfx-cell-horizontal-margin: 0.0;
-    -jfx-cell-vertical-margin: 5.0;
-    -jfx-vertical-gap: 10;
     -jfx-expanded: false;
     -fx-background-color: #fbfbfb;
 }

@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-    /* Conexao com o Banco de Dados */
+    /* Conexão com o Banco de Dados */
 
-        // Altere o USER e PASS de acordo com o seu Banco
+        // Altere o USER e PASS de acordo com as configurações do Banco a ser acessado
 
 public class ConnectionFactory {
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -14,19 +14,19 @@ public class ConnectionFactory {
     private static final String USER = "root";
     private static final String PASS = "root";
 
-    // Obtendo Conexao
+    // Obtendo Conexão
 
     public static Connection getConnection() {
         try {
             Class.forName(DRIVER);
             return DriverManager.getConnection(URL, USER, PASS);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException("Erro na Conexao", e);
+            System.err.println("Erro: " + e.getMessage());
+            return null;
         }
-
     }
 
-    // Fechando a conexao
+    // Fechando a Conexão
 
     public static void closeConnection(Connection connection) {
         if (connection != null) {

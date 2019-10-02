@@ -2,70 +2,55 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<?import javafx.geometry.Insets?>
-<?import java.net.URL?>
 <?import com.jfoenix.controls.JFXListView?>
 <?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXSpinner?>
 
-<BorderPane fx:id="borderPane" fx:controller="com.raphaelcollin.contatos.controller.ControllerPrincipal"
+<?import javafx.scene.image.ImageView?>
+<BorderPane fx:id="root" fx:controller="com.raphaelcollin.contatos.controller.ControllerPrincipal"
             xmlns:fx="http://javafx.com/fxml/1">
 
-    <!-- Padding -->
+    <top>
+        <AnchorPane>
 
-    <padding>
-        <Insets top="20" bottom="20"/>
-    </padding>
-    <stylesheets>  <!-- Inclusao do CSS -->
-        <URL value="@estilo.css"/>
-    </stylesheets>
+            <!-- Text Field da Janela Principal -->
+
+            <TextField promptText="Pesquisar Contato" fx:id="textField"/>
+
+            <!-- Botão de adicionar novo Contato -->
+
+            <ImageView fx:id="imageView" onMouseClicked="#handleAdicionarContato"/>
+
+        </AnchorPane>
+    </top>
+
     <center>
-        <GridPane alignment="TOP_CENTER" hgap="20" vgap="10">
-
-                <!-- Text Field da Janela Principal -->
-
-            <TextField promptText="Pesquisar Contato" fx:id="textField" GridPane.rowIndex="0" GridPane.columnIndex="0">
-                <font>
-                    <Font name="Arial" size="22"/>
-                </font>
-            </TextField>
-
-                <!-- Botao de adicionar novo Contato -->
-
-            <JFXButton styleClass="add-button" fx:id="addButton" onAction="#handleButton"
-                       onMouseEntered="#handleMouseEntered" onMouseExited="#handleMouseExited"
-                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <GridPane>
 
                 <!-- List View -->
 
             <JFXListView visible="false" fx:id="listView" onKeyPressed="#handleKeyPressed"
-                         onMouseClicked="#handleListDoubleClick" GridPane.vgrow="ALWAYS" GridPane.rowIndex="1"
-                         GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+                         onMouseClicked="#handleListDoubleClick" GridPane.vgrow="ALWAYS"
+                         GridPane.hgrow="ALWAYS"/>
 
                 <!-- Proggress Indicator -->
 
-            <JFXSpinner fx:id="spinner" GridPane.rowIndex="1" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-
+            <JFXSpinner fx:id="spinner"/>
         </GridPane>
+
     </center>
+
     <bottom>
 
-            <!-- Botoes Abrir Contato e Excluir Contato -->
+            <!-- Botões Abrir Contato e Excluir Contato -->
 
         <GridPane alignment="CENTER">
 
-            <JFXButton text="Excluir Contato" fx:id="excluirButton" styleClass="orange-button" onAction="#handleExcluir"
-                       onMouseEntered="#handleMouseEntered" onMouseExited="#handleMouseExited" GridPane.rowIndex="0"
-                       GridPane.columnIndex="0"/>
+            <JFXButton text="Excluir Contato" fx:id="excluirButton"
+                       onAction="#handleExcluirContato" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
-            <JFXButton text="Abrir Contato" fx:id="abrirButton" styleClass="blue-button" defaultButton="true"
-                       onAction="#handleAbrirContato" onMouseEntered="#handleMouseEntered" onMouseExited="#handleMouseExited"
-                       GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-            <BorderPane.margin>
-                <Insets top="20"/>
-            </BorderPane.margin>
+            <JFXButton text="Abrir Contato" fx:id="abrirButton" defaultButton="true"
+                       onAction="#handleAbrirContato" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
         </GridPane>
     </bottom>

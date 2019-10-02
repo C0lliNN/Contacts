@@ -7,35 +7,40 @@ import javafx.collections.ObservableList;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 public class ContatoDAO {
 
-            /* Nessa classe, estamos utilizando o metodo de Singleton que permite apenas uma unica instancia de uma
+            /* Nessa classe, será utilizado o recurso de Singleton que permite apenas uma única instancia de uma
              * classe */
 
-        // Conexao
+        // Conexão
     
     private Connection connection;
 
     private static ContatoDAO instance = new ContatoDAO();
 
-        // Obetendo conexao
+    // Constantes relativas a estrutura do Banco de Dados
+
+    private static final String TABELA_CONTATOS_DB = "contatos";
+    private static final String COLUNA_IDCONTATO_DB = "idContato";
+    private static final String COLUNA_NOME_DB = "nome";
+
+        // Obetendo Conexão
     
     private ContatoDAO(){
         connection = ConnectionFactory.getConnection();
     }
 
-        /* Metodo que ira adicionar um Contato ao Banco de Dados
-         * Esse metodo recebera um Objeto da Classe Contato e retornara true no caso de sucesso
-          * e false no caso de erro*/
+        /* Metodo que irá adicionar um Contato ao Banco de Dados
+         * Este método receberá um Objeto da Classe Contato e retornará true no caso de sucesso
+          * e false no caso de erro */
         
-    public int insertContato(Contato contato){
+    public int adicionarContato(Contato contato){
         
-        String sql = "insert into Contatos values(null,?,?,?,?,?)";
+        String query = "insert into " + TABELA_CONTATOS_DB + " values(null,?,?,?,?,?)";
         
-        try (PreparedStatement statement = connection.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, contato.getNome());
             statement.setString(2,contato.getSexo());
             statement.setString(3, contato.getNumero());
@@ -54,14 +59,20 @@ public class ContatoDAO {
 
             return idGerado;
 
-        } catch (SQLException ex) {
-            System.err.println("Erro: " + ex.getMessage());
+        } catch (Exception e) {
+            System.err.println("Erro: " + e.getMessage());
             return -1;
         }
     }
 
-    public Contato selectContato(int id){
-        try (PreparedStatement statement = connection.prepareStatement("select * from contatos where idContato = ?"
+    /* Este método recebe como parâmetro o Id do contato e retorna um objeto do tipo Contato contendo os dados do
+       respectivo contato */
+
+    public Contato recuperarContato(int id){
+
+        String query = "select * from " + TABELA_CONTATOS_DB +" where " + COLUNA_IDCONTATO_DB + " = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query
             , PreparedStatement.RETURN_GENERATED_KEYS)){
             statement.setInt(1,id);
 
@@ -77,19 +88,19 @@ public class ContatoDAO {
             return contato;
 
 
-        } catch (SQLException e){
+        } catch (Exception e){
             System.out.println("Erro: " + e.getMessage());
             return null;
         }
     }
 
 
-        /* Esse metodo sera executado toda vez que a pagina principal da Aplicacao for carregada
-         * Esse metodo vai retorar a lista de todos os contatos cadastrados no banco ordenados em ordem alfabetica */
+        /* Este método será executado toda vez que a pagina principal da Aplicação for carregada.
+         * Será retornada a lista de todos os contatos cadastrados no banco ordenados em ordem alfabética */
 
-    public ObservableList<Contato> selectContatos(){
+    public ObservableList<Contato> recuperarTodosContatos(){
 
-        String sql = "select * from Contatos order by nome";
+        String sql = "select * from " + TABELA_CONTATOS_DB + " order by " + COLUNA_NOME_DB;
 
         ObservableList<Contato> contatos = FXCollections.observableArrayList();
 
@@ -103,19 +114,19 @@ public class ContatoDAO {
             }
             return contatos;
 
-        } catch (SQLException e){
+        } catch (Exception e){
             System.out.println("Erro: " + e.getMessage());
             return null;
         }
     }
 
-        /* Esse metodo vai atualizar um contato no banco
-         * Esse metodo vai receber uma string que sera executada, os atributos dos campos que serao atualizados, o id
-          * do contato e retornara true no caso de sucesso e false no caso de erro */
+        /* Este método será utilizado para atualizar um contato no banco de dados.
+         * Será recebida a query que será executada, os atributos dos campos que serão atualizados e o id
+          * do contato que será atualizado. Será retornado true no caso de sucesso e false no caso de erro */
 
-    public boolean updateContato(String sql,List<String> campos, int id) {
+    public boolean atualizarContato(String query, List<String> campos, int id) {
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             for (int c = 0; c < campos.size(); c++){
                 preparedStatement.setString(c+1,campos.get(c));
@@ -125,27 +136,30 @@ public class ContatoDAO {
 
             preparedStatement.execute();
             return true;
-        } catch (SQLException e){
+        } catch (Exception e){
             System.err.println("Erro: " + e.getMessage());
             return false;
         }
     }
 
-        /*  Esse metodo vai excluir um contato do banco de dados
-         *  Esse metodo vai receber o id do contato e retornara true no caso de sucesso e false no caso de erro */
+        /*  Este método irá excluir um contato do banco de dados. Será recebido o id do contato e será
+            retornado true no caso de sucesso e false no caso de erro */
 
-    public boolean deleteContato(int id){
-        try (PreparedStatement statement = connection.prepareStatement("delete from Contatos where idContato = ?")) {
+    public boolean excluirContato(int id){
+
+        String query = "delete from " + TABELA_CONTATOS_DB + " where " + COLUNA_IDCONTATO_DB + " = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1,id);
             statement.execute();
             return true;
-        } catch (SQLException e){
+        } catch (Exception e){
             System.out.println("Erro: " + e.getMessage());
             return false;
         }
     }
 
-        /* Fechando a Conexa com o Banco de Dados */
+        /* Fechando a Conexão com o Banco de Dados */
 
     public void closeConnection(){
         ConnectionFactory.closeConnection(connection);
