@@ -20,8 +20,4 @@ Uma Aplicação com Interface Gráfica e acesso à Banco de Dados MySQL feito em
 
 ![contato3](https://user-images.githubusercontent.com/44872660/51091350-d7742580-1770-11e9-9ec5-b2248edd4cca.png)
 
-## Download do arquivo executável
-
-### [Link para Download](https://drive.google.com/open?id=1gPbf5z8v9f4KZUFm6d7VhEN3jc6MRDCG)
-
 ## Aceito Dicas, Críticas e/ou Sugestões
