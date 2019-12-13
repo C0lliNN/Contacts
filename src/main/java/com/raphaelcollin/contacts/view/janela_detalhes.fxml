@@ -1,79 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.control.ToggleGroup?>
-<?import com.jfoenix.controls.JFXRadioButton?>
+<?import javafx.scene.control.TextField?>
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXRadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 
-<GridPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-          fx:id="root" alignment="TOP_CENTER" fx:controller="com.raphaelcollin.contatos.controller.ControllerAdicionar">
+<GridPane fx:id="root" xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.raphaelcollin.contacts.controller.ControllerDetalhes" alignment="TOP_CENTER">
 
-        <!-- Imagem -->
+    <!-- Imagem -->
 
     <HBox alignment="CENTER" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2">
         <ImageView fx:id="imageView"/>
     </HBox>
 
-        <!-- Nome -->
+
+    <!-- Nome -->
 
     <Label text="Nome:" fx:id="nomeLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="1"
            GridPane.columnIndex="0"/>
+
     <TextField promptText="Nome do Contato" fx:id="nomeField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-        <!-- Sexo -->
+    <!-- Sexo -->
 
     <Label text="Sexo:" fx:id="sexoLabel" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-
-        <!-- Toggle Group -->
 
     <fx:define>
         <ToggleGroup fx:id="radioGroup"/>
     </fx:define>
 
-    <!-- Radio Buttons-->
+    <!-- Radio Buttons -->
 
     <HBox fx:id="hBoxRadio" GridPane.rowIndex="2" GridPane.columnIndex="1">
         <JFXRadioButton text="Masculino" fx:id="masculinoRadio" selected="true" toggleGroup="$radioGroup"/>
-        <JFXRadioButton text="Feminino"  fx:id="femininoRadio" toggleGroup="$radioGroup"/>
+        <JFXRadioButton text="Feminino" fx:id="femininoRadio" toggleGroup="$radioGroup"/>
     </HBox>
 
-        <!-- Número -->
+
+    <!-- Numero -->
 
     <Label text="Número:" fx:id="numeroLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="3"
            GridPane.columnIndex="0"/>
 
-    <TextField promptText="Número do Contato" fx:id="numeroField" GridPane.rowIndex="3"
-               GridPane.columnIndex="1"/>
+    <TextField promptText="Número do Contato" fx:id="numeroField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-        <!-- E-mail -->
+    <!-- E-mail -->
 
     <Label text="E-mail:" fx:id="emailLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="4"
            GridPane.columnIndex="0"/>
 
-    <TextField promptText="exemplo@exemplo.com" fx:id="emailField" GridPane.rowIndex="4"
-               GridPane.columnIndex="1"/>
+    <TextField promptText="exemplo@exemplo.com" fx:id="emailField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
-        <!-- Descrição -->
+    <!-- Descrição -->
 
     <Label text="Descrição: (Opcional)" fx:id="descricaoLabel" GridPane.rowIndex="5" GridPane.columnIndex="0"
            GridPane.columnSpan="2"/>
 
-    <TextArea promptText="Descreva o Contato" fx:id="descricaoField" wrapText="true" GridPane.rowIndex="6"
+    <TextArea promptText="Descreva o Contato"  wrapText="true" fx:id="descricaoField" GridPane.rowIndex="6"
               GridPane.columnIndex="0" GridPane.columnSpan="2"/>
 
-        <!-- Botões -->
+    <!-- Botões -->
 
     <GridPane alignment="CENTER" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.columnSpan="2">
 
         <JFXButton text="Voltar" fx:id="voltarButton" onAction="#handleVoltar"
                    GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
-        <JFXButton text="Adicionar" fx:id="adicionarButton" onAction="#handleAdicionar" defaultButton="true"
-                   GridPane.rowIndex="0" GridPane.columnIndex="1" />
+        <JFXButton text="Salvar" fx:id="salvarButton" disable="true" defaultButton="true"
+                   onAction="#handleSalvar" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
     </GridPane>
 

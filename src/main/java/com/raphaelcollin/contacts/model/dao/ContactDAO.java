@@ -1,6 +1,6 @@
-package com.raphaelcollin.contatos.model;
+package com.raphaelcollin.contacts.model;
 
-import com.raphaelcollin.contatos.ConnectionFactory;
+import com.raphaelcollin.contacts.ConnectionFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 

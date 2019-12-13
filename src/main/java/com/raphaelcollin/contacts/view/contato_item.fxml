@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <GridPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
-          fx:controller="com.raphaelcollin.contatos.controller.ControllerContato">
+          fx:controller="com.raphaelcollin.contacts.controller.ControllerContato">
 
     <ImageView fx:id="imageView" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="0"/>
 

@@ -7,7 +7,7 @@
 <?import com.jfoenix.controls.JFXSpinner?>
 
 <?import javafx.scene.image.ImageView?>
-<BorderPane fx:id="root" fx:controller="com.raphaelcollin.contatos.controller.ControllerPrincipal"
+<BorderPane fx:id="root" fx:controller="com.raphaelcollin.contacts.controller.ControllerPrincipal"
             xmlns:fx="http://javafx.com/fxml/1">
 
     <top>
