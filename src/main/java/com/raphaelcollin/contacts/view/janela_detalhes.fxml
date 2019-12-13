@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.control.TextField?>
-<?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXRadioButton?>
-<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.*?>
+<!--
+  ~ /**
+  ~ * @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+  ~ * @copyright (c) 2019
+  ~ */
+  -->
 
 <GridPane fx:id="root" xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.raphaelcollin.contacts.controller.ControllerDetalhes" alignment="TOP_CENTER">
@@ -37,8 +38,8 @@
     <!-- Radio Buttons -->
 
     <HBox fx:id="hBoxRadio" GridPane.rowIndex="2" GridPane.columnIndex="1">
-        <JFXRadioButton text="Masculino" fx:id="masculinoRadio" selected="true" toggleGroup="$radioGroup"/>
-        <JFXRadioButton text="Feminino" fx:id="femininoRadio" toggleGroup="$radioGroup"/>
+        <RadioButton text="Masculino" fx:id="masculinoRadio" selected="true" toggleGroup="$radioGroup"/>
+        <RadioButton text="Feminino" fx:id="femininoRadio" toggleGroup="$radioGroup"/>
     </HBox>
 
 
@@ -68,10 +69,10 @@
 
     <GridPane alignment="CENTER" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.columnSpan="2">
 
-        <JFXButton text="Voltar" fx:id="voltarButton" onAction="#handleVoltar"
+        <Button text="Voltar" fx:id="voltarButton" onAction="#handleVoltar"
                    GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
-        <JFXButton text="Salvar" fx:id="salvarButton" disable="true" defaultButton="true"
+        <Button text="Salvar" fx:id="salvarButton" disable="true" defaultButton="true"
                    onAction="#handleSalvar" GridPane.rowIndex="0" GridPane.columnIndex="1" />
 
     </GridPane>

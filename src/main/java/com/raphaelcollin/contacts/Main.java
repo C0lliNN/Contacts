@@ -1,11 +1,12 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * *
+ *  @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+ *  @copyright (c) 2019
+ * /
  */
-package com.raphaelcollin.contatos;
 
-import com.raphaelcollin.contatos.model.ContatoDAO;
+package com.raphaelcollin.contacts;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -21,45 +22,32 @@ import java.io.IOException;
 
 public class Main extends Application {
 
-    // Constantes
+    // Constants
 
-    private static final String URL_JANELA_PRINCIPAL = "/janela_principal.fxml";
+    private static final String LOCATION_DASHBOARD = "/dashboard.fxml";
     private static final String URL_ESTILO_CSS = "/estilo.css";
     private static final String TITULO_STAGE = "Contatos";
-    private static final String URL_ICONE = "file:arquivos/icon.png";
+    private static final String URL_ICONE = "/icon.png";
 
     @Override
-    public void start(Stage primaryStage) throws IOException{
-        Parent root = FXMLLoader.load(getClass().getResource(URL_JANELA_PRINCIPAL));
+    public void start(Stage stage) throws IOException{
 
-            /* Colocando a janela com 30% da largura do dispositivo em que esta sendo executada a aplicacao
-             * Colocando a janela com 60% da altura do dispositivo em que esta sendo executada a aplicacao */
+        Parent root = FXMLLoader.load(getClass().getResource(LOCATION_DASHBOARD));
 
         Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
-        double largura = tamanhoTela.getWidth() * 0.3;
-        double altura = tamanhoTela.getWidth() * 0.3 * 1.125;
+        double width = tamanhoTela.getWidth() * 0.3; // 30%
+        double height = tamanhoTela.getWidth() * 0.3 * 1.125; // Keep aspect radio
 
-        Scene scene = new Scene(root,largura,altura);
+        Scene scene = new Scene(root,width,height);
         scene.getStylesheets().add(getClass().getResource(URL_ESTILO_CSS).toExternalForm());
         
-        primaryStage.setTitle(TITULO_STAGE);
-        primaryStage.setScene(scene);
-        primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image (URL_ICONE));
-        primaryStage.show();
-    }
+        stage.setTitle(TITULO_STAGE);
+        stage.setScene(scene);
+        stage.setResizable(false);
+        stage.getIcons().add(new Image (getClass().getResourceAsStream(URL_ICONE)));
+        stage.show();
+    }// Finalizando a conexão com o banco de dados
 
-    // Finalizando a conexão com o banco de dados
-
-    @Override
-    public void stop(){
-        try {
-            ContatoDAO.getInstance().closeConnection();
-        } catch (Exception e) {
-            System.err.println("Erro: " + e.getMessage());
-        }
-
-    }
 
     public static void main(String[] args) {
         launch(args);

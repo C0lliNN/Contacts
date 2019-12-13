@@ -1,10 +1,15 @@
-package com.raphaelcollin.contatos.controller;
+/*
+ * *
+ *  @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+ *  @copyright (c) 2019
+ * /
+ */
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXListView;
-import com.jfoenix.controls.JFXSpinner;
-import com.raphaelcollin.contatos.model.Contato;
-import com.raphaelcollin.contatos.model.ContatoDAO;
+package com.raphaelcollin.contacts.controller;
+
+import com.raphaelcollin.contacts.model.Contact;
+import com.raphaelcollin.contacts.model.dao.ContactDAO;
+import com.raphaelcollin.contacts.model.dao.DAO;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,7 +39,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.Optional;
 
-public class ControllerPrincipal {
+public class ControllerDashboard {
 
 
     @FXML
@@ -44,13 +49,13 @@ public class ControllerPrincipal {
     @FXML
     private ImageView imageView;
     @FXML
-    private JFXListView<GridPane> listView;
+    private ListView<GridPane> listView;
     @FXML
-    private JFXSpinner spinner;
+    private Spinner<Double> spinner;
     @FXML
-    private JFXButton excluirButton;
+    private Button excluirButton;
     @FXML
-    private JFXButton abrirButton;
+    private Button abrirButton;
 
         // Tamanho atual da tela
 
@@ -63,9 +68,9 @@ public class ControllerPrincipal {
         // Constantes
 
     private static final String URL_IMAGEM_ICONE_MAIS = "file:arquivos/add-contact-icon.png";
-    private static final String URL_ARQUIVO_CONTATO_FXML = "/contato_item.fxml";
-    private static final String URL_JANELA_ADICIONAR = "/janela_adicionar.fxml";
-    private static final String URL_JANELA_DETALHES = "/janela_detalhes.fxml";
+    private static final String URL_ARQUIVO_CONTATO_FXML = "/com/raphaelcollin/contacts/view/contato_item.fxml";
+    private static final String URL_JANELA_ADICIONAR = "/com/raphaelcollin/contacts/view/janela_adicionar.fxml";
+    private static final String URL_JANELA_DETALHES = "/com/raphaelcollin/contacts/view/janela_detalhes.fxml";
 
     private static final String ID_IMAGEM_ADICIONAR_CONTATO = "imagem-adicionar-contato";
     private static final String CLASS_BOTAO_EXCLUIR_CONTATO =  "botao-laranja";
@@ -158,11 +163,12 @@ public class ControllerPrincipal {
             *  o progressIndicator será escondido e será colocado a lista de contatos no lugar. Caso contrário, um alert será exibido
             *  indicando erro na conexão com o Banco de Dados e aplicação será fechada */
 
-        Task<ObservableList<Contato>> task = new Task<ObservableList<Contato>>() {
+        Task<ObservableList<Contact>> task = new Task<>() {
             @Override
-            protected ObservableList<Contato> call(){
+            protected ObservableList<Contact> call() {
                 root.setCursor(Cursor.WAIT);
-                return ContatoDAO.getInstance().recuperarTodosContatos();
+                DAO<Contact> dao = new ContactDAO();
+                return dao.selectAll();
             }
         };
 
@@ -170,9 +176,9 @@ public class ControllerPrincipal {
 
             root.setCursor(Cursor.DEFAULT);
             gridList = FXCollections.observableArrayList();
-            ObservableList<Contato> contatos = task.getValue();
+            ObservableList<Contact> contacts = task.getValue();
 
-            if (contatos == null) {
+            if (contacts == null) {
 
                 HBox hBox = new HBox();
                 hBox.setAlignment(Pos.TOP_CENTER);
@@ -196,8 +202,8 @@ public class ControllerPrincipal {
                 /* Se não houver nenhum contato adicionado a lista, um label será exibindo informando esse fato.
                    Caso contrário, os contatos serão carregados */
 
-            if (contatos.size() > 0){
-                for (Contato contato : contatos){
+            if (contacts.size() > 0){
+                for (Contact contact : contacts){
 
                         // Criando e configurando um item da lista (GridPane)
 
@@ -206,12 +212,12 @@ public class ControllerPrincipal {
                         GridPane gridPane = fxmlLoader.load();
                         ControllerContato controllerContato = fxmlLoader.getController();
 
-                        controllerContato.getIdField().setText(String.format("%d",contato.getId()));
-                        controllerContato.getNomeField().setText(contato.getNome());
-                        controllerContato.getSexoField().setText(contato.getSexo());
-                        controllerContato.getNumeroField().setText(contato.getNumero());
-                        controllerContato.getEmailField().setText(contato.getEmail());
-                        controllerContato.getDescricaoField().setText(contato.getDescricao());
+                        controllerContato.getIdField().setText(String.format("%d", contact.getIdContact()));
+                        controllerContato.getNomeField().setText(contact.getName());
+                        controllerContato.getSexoField().setText(contact.getGender());
+                        controllerContato.getNumeroField().setText(contact.getPhoneNumber());
+                        controllerContato.getEmailField().setText(contact.getEmail());
+                        controllerContato.getDescricaoField().setText(contact.getDescription());
 
                         controllerContato.setImage();
 
@@ -345,10 +351,11 @@ public class ControllerPrincipal {
 
 
             if (result.isPresent() && result.get().equals(ButtonType.OK)){
-                Task<Boolean> task = new Task<Boolean>() {
+                Task<Boolean> task = new Task<>() {
                     @Override
                     protected Boolean call() {
-                        return ContatoDAO.getInstance().excluirContato(intId);
+                        DAO<Contact> dao = new ContactDAO(new Contact(intId));
+                        return dao.delete();
                     }
                 };
 
@@ -392,7 +399,7 @@ public class ControllerPrincipal {
             String email = ((Label) ((VBox) gridPane.getChildren().get(1)).getChildren().get(4)).getText();
             String descricao = ((Label) ((VBox) gridPane.getChildren().get(1)).getChildren().get(5)).getText();
 
-            Contato contato = new Contato(intId,nome,sexo,numero,email,descricao);
+            Contact contact = new Contact(intId,nome,sexo,numero,email,descricao);
 
             Stage stage = (Stage) root.getScene().getWindow();
             FXMLLoader fxmlLoader;
@@ -401,7 +408,7 @@ public class ControllerPrincipal {
                 GridPane root = fxmlLoader.load();
 
                 ControllerDetalhes controllerDetalhes = fxmlLoader.getController();
-                controllerDetalhes.setContato(contato);
+                controllerDetalhes.setContact(contact);
 
                 // Inicializando campos com os respectivos atributos
 

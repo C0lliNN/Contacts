@@ -7,7 +7,7 @@ Uma Aplicação com Interface Gráfica e acesso à Banco de Dados MySQL feito em
 
 * Armazenamento de Contatos de forma permanente e segura
 * Interface amigável
-* Facilidade de organizar contatos
+* Facilidade de organizar contacts
 
 ## Como Utilizar essa Aplicação
 
@@ -16,7 +16,7 @@ Uma Aplicação com Interface Gráfica e acesso à Banco de Dados MySQL feito em
 ![contato1](https://i.imgur.com/gvbmHGk.png)
 
 
-### 2 - Alterar o USER e PASS da Classe ConnectionFactory do pacote com.raphaelcollin.contatos de acordo com o usuário e senha do seu Banco de Dados MySQL
+### 2 - Alterar o USER e PASS da Classe ConnectionFactory do pacote com.raphaelcollin.contacts de acordo com o usuário e senha do seu Banco de Dados MySQL
 
 ![contato3](https://user-images.githubusercontent.com/44872660/51091350-d7742580-1770-11e9-9ec5-b2248edd4cca.png)
 

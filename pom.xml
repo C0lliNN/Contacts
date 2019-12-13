@@ -22,14 +22,16 @@
     <build>
 
         <resources>
+
             <resource>
-                <directory>src/main/java/resources</directory>
+                <directory>src/main/resources</directory>
+            </resource>
+
+            <resource>
+                <directory>src/main/java/com/raphaelcollin/contacts/view</directory>
             </resource>
             <resource>
-                <directory>src/main/java/com/raphaelcollin/view</directory>
-            </resource>
-            <resource>
-                <directory>src/main/java/com/raphaelcollin/styles</directory>
+                <directory>src/main/java/com/raphaelcollin/contacts/styles</directory>
             </resource>
         </resources>
 
@@ -113,6 +115,12 @@
                                     <directory>resources</directory>
                                     <filtering>true</filtering>
                                 </resource>
+                                <resource>
+                                    <directory>src/main/java/com/raphaelcollin/view</directory>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/java/com/raphaelcollin/styles</directory>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -175,15 +183,22 @@
         </dependency>
 
         <dependency>
-            <groupId>com.jfoenix</groupId>
-            <artifactId>jfoenix</artifactId>
-            <version>9.0.8</version>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.0.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.4.0</version>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.5.2</version>
             <scope>test</scope>
         </dependency>
 

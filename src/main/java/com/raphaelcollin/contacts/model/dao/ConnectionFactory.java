@@ -1,4 +1,11 @@
-package com.raphaelcollin.contatos;
+/*
+ * *
+ *  @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+ *  @copyright (c) 2019
+ * /
+ */
+
+package com.raphaelcollin.contacts.model.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,7 +17,9 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String URL = "jdbc:mysql://localhost:3307/contatos?useTimezone=true&serverTimezone=UTC";
+    private static final String PORT = "3306";
+    private static final String DB_NAME = "contacts";
+    private static final String URL = "jdbc:mysql://localhost:" + PORT + "/" + DB_NAME + "?useTimezone=true&serverTimezone=UTC&useSSL=false";
     private static final String USER = "root";
     private static final String PASS = "root";
 
@@ -32,7 +41,7 @@ public class ConnectionFactory {
         if (connection != null) {
             try {
                 connection.close();
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 System.out.println("Erro: " + e.getMessage());
             }
         }

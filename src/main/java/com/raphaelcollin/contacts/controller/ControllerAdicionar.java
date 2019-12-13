@@ -1,9 +1,15 @@
-package com.raphaelcollin.contatos.controller;
+/*
+ * *
+ *  @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+ *  @copyright (c) 2019
+ * /
+ */
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXRadioButton;
-import com.raphaelcollin.contatos.model.Contato;
-import com.raphaelcollin.contatos.model.ContatoDAO;
+package com.raphaelcollin.contacts.controller;
+
+import com.raphaelcollin.contacts.model.Contact;
+import com.raphaelcollin.contacts.model.dao.ContactDAO;
+import com.raphaelcollin.contacts.model.dao.DAO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -36,9 +42,9 @@ public class ControllerAdicionar {
     @FXML
     private ToggleGroup radioGroup;
     @FXML
-    private JFXRadioButton masculinoRadio;
+    private RadioButton masculinoRadio;
     @FXML
-    private JFXRadioButton femininoRadio;
+    private RadioButton femininoRadio;
     @FXML
     private Label nomeLabel;
     @FXML
@@ -60,9 +66,9 @@ public class ControllerAdicionar {
     @FXML
     private HBox hBoxRadio;
     @FXML
-    private JFXButton voltarButton;
+    private Button voltarButton;
     @FXML
-    private JFXButton adicionarButton;
+    private Button adicionarButton;
 
     // Tamanho atual da tela
 
@@ -84,7 +90,7 @@ public class ControllerAdicionar {
     private static final String CLASSE_BOTAO_ADICIONAR =  "botao-azul";
     private static final String CLASSE_FIELD = "adicionar-field";
     private static final String CLASSE_BORDA_VERMELHA = "borda-vermelha";
-    private static final String URL_JANELA_PRINCIPAL = "/janela_principal.fxml";
+    private static final String URL_JANELA_PRINCIPAL = "/com/raphaelcollin/contacts/view/dashboard.fxml";
 
     public void initialize(){
 
@@ -231,13 +237,14 @@ public class ControllerAdicionar {
                 descricao = descricaoField.getText();
             }
 
-            Contato contato = new Contato(nome,sexo,numero,email,descricao);
+            Contact contact = new Contact(nome,sexo,numero,email,descricao);
 
-            Task<Integer> task = new Task<Integer>() {
+            Task<Integer> task = new Task<>() {
                 @Override
-                protected Integer call(){
+                protected Integer call() {
                     root.setCursor(Cursor.WAIT);
-                    return ContatoDAO.getInstance().adicionarContato(contato);
+                    DAO<Contact> dao = new ContactDAO(contact);
+                    return dao.insert();
                 }
             };
 
@@ -253,7 +260,7 @@ public class ControllerAdicionar {
                     descricaoField.clear();
                     nomeField.requestFocus();
 
-                    contato.setId(task.getValue());
+                    contact.setIdContact(task.getValue());
 
                 } else {
                     exibirAlert(Alert.AlertType.ERROR,"Erro no Processamento","Não foi possível inserir o contato",

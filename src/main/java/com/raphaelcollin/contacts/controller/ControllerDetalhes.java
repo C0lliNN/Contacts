@@ -1,9 +1,16 @@
-package com.raphaelcollin.contatos.controller;
+/*
+ * *
+ *  @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+ *  @copyright (c) 2019
+ * /
+ */
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXRadioButton;
-import com.raphaelcollin.contatos.model.Contato;
-import com.raphaelcollin.contatos.model.ContatoDAO;
+package com.raphaelcollin.contacts.controller;
+
+
+import com.raphaelcollin.contacts.model.Contact;
+import com.raphaelcollin.contacts.model.dao.ContactDAO;
+import com.raphaelcollin.contacts.model.dao.DAO;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,8 +31,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class ControllerDetalhes {
@@ -43,9 +48,9 @@ public class ControllerDetalhes {
     @FXML
     private HBox hBoxRadio;
     @FXML
-    private JFXRadioButton masculinoRadio;
+    private RadioButton masculinoRadio;
     @FXML
-    private JFXRadioButton femininoRadio;
+    private RadioButton femininoRadio;
     @FXML
     private Label numeroLabel;
     @FXML
@@ -61,13 +66,13 @@ public class ControllerDetalhes {
     @FXML
     private TextArea descricaoField;
     @FXML
-    private JFXButton voltarButton;
+    private Button voltarButton;
     @FXML
-    private JFXButton salvarButton;
+    private Button salvarButton;
 
         // Contato que está sendo visualizado
 
-    private Contato contato;
+    private Contact contact;
 
     // Tamanho atual da tela
 
@@ -88,7 +93,7 @@ public class ControllerDetalhes {
     private static final String CLASSE_BOTAO_SALVAR =  "botao-azul";
     private static final String CLASSE_FIELD = "adicionar-field";
     private static final String CLASSE_BORDA_VERMELHA = "borda-vermelha";
-    private static final String URL_JANELA_PRINCIPAL = "/janela_principal.fxml";
+    private static final String URL_JANELA_PRINCIPAL = "/com/raphaelcollin/contacts/view/dashboard.fxml";
 
     // Constantes relativas a estrutura do Banco de Dados
 
@@ -271,87 +276,20 @@ public class ControllerDetalhes {
 
         if (!erroEncontrado) {
 
-            // Objeto que será usado para construir a query
+            if (!(nomeField.getText().equals(contact.getName()) && numeroField.getText().equals(contact.getPhoneNumber())
+                    && emailField.getText().equals(contact.getEmail()) && ((contact.getDescription() != null && descricaoField.getText().isEmpty())
+                    || (contact.getDescription() != null && descricaoField.getText().equals(contact.getDescription()))))) {
 
-            StringBuilder query = new StringBuilder("update ");
-            query.append(TABELA_CONTATOS_DB);
+                Contact newContact = new Contact(nomeField.getText(), ((ToggleButton) radioGroup.getSelectedToggle()).getText(), numeroField.getText(),
+                        emailField.getText(), descricaoField.getText());
 
-            List<String> campos = new ArrayList<>();
-
-            int count = 0;
-
-
-                /* Se a condição abaixo for verdadeira, significa que algum campo foi alterado, ou seja o contato
-                    foi alterado, então a atualização no banco precisa ser feita, se a condição for falsa, ou seja,
-                    nenhum campo foi alterado, será apenas desabilitado o botão salvar*/
-
-            if (!(nomeField.getText().equals(contato.getNome()) && numeroField.getText().equals(contato.getNumero())
-                    && emailField.getText().equals(contato.getEmail()) && ((contato.getDescricao() != null && descricaoField.getText().isEmpty())
-                    || (contato.getDescricao() != null && descricaoField.getText().equals(contato.getDescricao()))))) {
-
-                /* Está sendo usado o caracter especial ? ao invés de concatenar diretamente a string para
-                   evitar ataques SQLInjection */
-
-                if (!nomeField.getText().equals(contato.getNome())){
-                    query.append(" set ").append(COLUNA_NOME_DB).append(" = ?");
-                    campos.add(nomeField.getText());
-                    count++;
-                }
-
-                if (!((RadioButton) radioGroup.getSelectedToggle()).getText().equals(contato.getSexo())){
-                    if (count == 1) {
-                        query.append(", ");
-                        query.append(COLUNA_SEXO_DB).append(" = ?");
-                    } else {
-                        query.append(" set ").append(COLUNA_SEXO_DB).append(" = ?");
-                    }
-
-                    campos.add(((RadioButton) radioGroup.getSelectedToggle()).getText());
-                    count++;
-                }
-
-                if (!numeroField.getText().equals(contato.getNumero())){
-                    if (count >= 1) {
-                        query.append(", ");
-                        query.append(COLUNA_NUMERO_DB).append(" = ?");
-                    } else {
-                        query.append(" set ").append(COLUNA_NUMERO_DB).append(" = ?");
-                    }
-
-                    campos.add(numeroField.getText());
-                    count++;
-                }
-
-                if (!emailField.getText().equals(contato.getEmail())){
-                    if (count >= 1) {
-                        query.append(", ");
-                        query.append(COLUNA_EMAIL_DB).append(" = ?");
-                    } else {
-                        query.append(" set ").append(COLUNA_EMAIL_DB).append(" = ?");
-                    }
-                    campos.add(emailField.getText());
-                    count++;
-                }
-
-                if ((contato.getDescricao() == null && !descricaoField.getText().trim().isEmpty()) || (contato.getDescricao() != null
-                        && !descricaoField.getText().equals(contato.getDescricao()))) {
-                    if (count >= 1) {
-                        query.append(", ");
-                        query.append(COLUNA_DESCRICAO_DB).append(" = ?");
-                    } else {
-                        query.append(" set ").append(COLUNA_DESCRICAO_DB).append(" = ?");
-                    }
-
-                    campos.add(descricaoField.getText());
-                }
-
-                query.append(" where ").append(COLUNA_IDCONTATO_DB).append(" = ?");
+                DAO<Contact> dao = new ContactDAO(newContact);
 
                 Task<Boolean> task = new Task<Boolean>() {
                     @Override
                     protected Boolean call(){
                         root.setCursor(Cursor.WAIT);
-                        return ContatoDAO.getInstance().atualizarContato(query.toString(),campos,contato.getId());
+                        return dao.update();
                     }
                 };
 
@@ -362,7 +300,7 @@ public class ControllerDetalhes {
                                 "Contato atualizado com sucesso","O contato foi atualizado e já " +
                                         "está disponível na lista de contatos!");
 
-                        contato = ContatoDAO.getInstance().recuperarContato(contato.getId());
+                        contact = newContact;
                         inicializarCampos();
 
                     } else {
@@ -418,15 +356,15 @@ public class ControllerDetalhes {
 
     void inicializarCampos(){
 
-        nomeField.setText(contato.getNome());
-        if (!contato.getSexo().equalsIgnoreCase("Masculino")){
+        nomeField.setText(contact.getName());
+        if (!contact.getGender().equalsIgnoreCase("Masculino")){
             femininoRadio.setSelected(true);
         }
 
-        numeroField.setText(contato.getNumero());
-        emailField.setText(contato.getEmail());
-        if (contato.getDescricao() != null){
-            descricaoField.setText(contato.getDescricao());
+        numeroField.setText(contact.getPhoneNumber());
+        emailField.setText(contact.getEmail());
+        if (contact.getDescription() != null){
+            descricaoField.setText(contact.getDescription());
         }
 
         salvarButton.setDisable(true);
@@ -446,7 +384,7 @@ public class ControllerDetalhes {
 
     // Setter
 
-    void setContato(Contato contato) {
-        this.contato = contato;
+    void setContact(Contact contact) {
+        this.contact = contact;
     }
 }

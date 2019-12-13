@@ -1,4 +1,11 @@
-package com.raphaelcollin.contatos.controller;
+/*
+ * *
+ *  @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+ *  @copyright (c) 2019
+ * /
+ */
+
+package com.raphaelcollin.contacts.controller;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
