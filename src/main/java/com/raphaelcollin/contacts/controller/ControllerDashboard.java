@@ -10,17 +10,13 @@ package com.raphaelcollin.contacts.controller;
 import com.raphaelcollin.contacts.model.Contact;
 import com.raphaelcollin.contacts.model.dao.ContactDAO;
 import com.raphaelcollin.contacts.model.dao.DAO;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -30,16 +26,21 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
-public class ControllerDashboard {
+public class ControllerDashboard extends Controller implements Initializable {
 
 
     @FXML
@@ -50,12 +51,6 @@ public class ControllerDashboard {
     private ImageView imageView;
     @FXML
     private ListView<GridPane> listView;
-    @FXML
-    private Spinner<Double> spinner;
-    @FXML
-    private Button excluirButton;
-    @FXML
-    private Button abrirButton;
 
         // Tamanho atual da tela
 
@@ -67,20 +62,27 @@ public class ControllerDashboard {
 
         // Constantes
 
-    private static final String URL_IMAGEM_ICONE_MAIS = "file:arquivos/add-contact-icon.png";
-    private static final String URL_ARQUIVO_CONTATO_FXML = "/com/raphaelcollin/contacts/view/contato_item.fxml";
-    private static final String URL_JANELA_ADICIONAR = "/com/raphaelcollin/contacts/view/janela_adicionar.fxml";
-    private static final String URL_JANELA_DETALHES = "/com/raphaelcollin/contacts/view/janela_detalhes.fxml";
+    private static final String LOCATION_ICON_ADD = "/add-contact-icon.png";
+    private static final String URL_ARQUIVO_CONTATO_FXML = "/contact_item.fxml";
+    private static final String LOCATION_ADD_CONTACT_VIEW = "/add_contact.fxml";
+    private static final String URL_JANELA_DETALHES = "/details_contact.fxml";
 
     private static final String ID_IMAGEM_ADICIONAR_CONTATO = "imagem-adicionar-contato";
     private static final String CLASS_BOTAO_EXCLUIR_CONTATO =  "botao-laranja";
     private static final String CLASS_BOTAO_ABRIR_CONTATO =  "botao-azul";
-        
-    public void initialize(){
+
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+
+        root.setPrefSize(getRootWidth(), getRootHeight());
+        root.setMinSize(getRootWidth(), getRootHeight());
+        root.setMaxSize(getRootWidth(), getRootHeight());
 
             // Padding e Margin
 
-        root.setPadding(new Insets(tamanhoTela.getHeight() * 0.0185,0.0,tamanhoTela.getHeight() * 0.0185,
+        root.setPadding(new Insets(tamanhoTela.getHeight() * 0.0185,0.0,0.0,
                 0.0));
         BorderPane.setMargin(root.getCenter(), new Insets(tamanhoTela.getHeight() * 0.0185,0.0,
                 tamanhoTela.getHeight() * 0.0185, 0.0));
@@ -89,22 +91,14 @@ public class ControllerDashboard {
 
         AnchorPane.setLeftAnchor(textField,tamanhoTela.getWidth() * 0.025);
         AnchorPane.setRightAnchor(textField, tamanhoTela.getWidth() * 0.07);
-        AnchorPane.setLeftAnchor(imageView, tamanhoTela.getWidth() * 0.25);
-        AnchorPane.setTopAnchor(imageView,- tamanhoTela.getHeight() * 0.00648);
+        AnchorPane.setLeftAnchor(imageView, tamanhoTela.getWidth() * 0.1);
+        AnchorPane.setTopAnchor(imageView, tamanhoTela.getHeight() * 0.00648);
 
         textField.setPrefWidth(tamanhoTela.getWidth() * 0.20);
         textField.setPrefHeight(tamanhoTela.getHeight() * 0.05);
         textField.setFont(new Font("Arial",tamanhoTela.getWidth() * 0.01145));
 
-        excluirButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
-        excluirButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
-        excluirButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
-
-        abrirButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
-        abrirButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
-        abrirButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
-
-        imageView.setImage(new Image(URL_IMAGEM_ICONE_MAIS));
+        imageView.setImage(new Image(getClass().getResourceAsStream(LOCATION_ICON_ADD)));
 
         imageView.setFitWidth(tamanhoTela.getHeight() * 0.068);
         imageView.setFitHeight(tamanhoTela.getHeight() * 0.065);
@@ -155,138 +149,6 @@ public class ControllerDashboard {
         // Difinindo Classes CSS
 
         imageView.setId(ID_IMAGEM_ADICIONAR_CONTATO);
-        excluirButton.getStyleClass().add(CLASS_BOTAO_EXCLUIR_CONTATO);
-        abrirButton.getStyleClass().add(CLASS_BOTAO_ABRIR_CONTATO);
-
-            /* Criando Thread para carregar os contatos do banco de dados. Enquanto a Task estiver sendo executada,
-            *  um progress indicator ficará aparecendo na tela. Quando a Task terminar sua execução, caso tenha sido executada com sucesso,
-            *  o progressIndicator será escondido e será colocado a lista de contatos no lugar. Caso contrário, um alert será exibido
-            *  indicando erro na conexão com o Banco de Dados e aplicação será fechada */
-
-        Task<ObservableList<Contact>> task = new Task<>() {
-            @Override
-            protected ObservableList<Contact> call() {
-                root.setCursor(Cursor.WAIT);
-                DAO<Contact> dao = new ContactDAO();
-                return dao.selectAll();
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-
-            root.setCursor(Cursor.DEFAULT);
-            gridList = FXCollections.observableArrayList();
-            ObservableList<Contact> contacts = task.getValue();
-
-            if (contacts == null) {
-
-                HBox hBox = new HBox();
-                hBox.setAlignment(Pos.TOP_CENTER);
-                Label label = new Label("Erro na Conexão com o Banco de Dados");
-                label.setFont(new Font(tamanhoTela.getWidth() * 0.01354));
-                hBox.getChildren().setAll(label);
-
-                GridPane gridPane = (GridPane) root.getCenter();
-                gridPane.setVgap(tamanhoTela.getHeight() * 0.04629);
-                gridPane.getChildren().remove(spinner);
-                gridPane.getChildren().add(hBox);
-                GridPane.setConstraints(hBox,0,1,2,1);
-
-                exibirAlert(Alert.AlertType.ERROR,"Contatos","Erro no Banco de Dados",
-                        "Não foi possível se conectar ao Banco de Dados MYSQL");
-
-                Platform.exit();
-                return;
-            }
-
-                /* Se não houver nenhum contato adicionado a lista, um label será exibindo informando esse fato.
-                   Caso contrário, os contatos serão carregados */
-
-            if (contacts.size() > 0){
-                for (Contact contact : contacts){
-
-                        // Criando e configurando um item da lista (GridPane)
-
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(URL_ARQUIVO_CONTATO_FXML));
-                    try {
-                        GridPane gridPane = fxmlLoader.load();
-                        ControllerContato controllerContato = fxmlLoader.getController();
-
-                        controllerContato.getIdField().setText(String.format("%d", contact.getIdContact()));
-                        controllerContato.getNomeField().setText(contact.getName());
-                        controllerContato.getSexoField().setText(contact.getGender());
-                        controllerContato.getNumeroField().setText(contact.getPhoneNumber());
-                        controllerContato.getEmailField().setText(contact.getEmail());
-                        controllerContato.getDescricaoField().setText(contact.getDescription());
-
-                        controllerContato.setImage();
-
-                        gridList.add(gridPane);
-
-                    } catch (IOException ex) {
-                        System.err.println("Erro: " + ex.getMessage());
-                    }
-                }
-
-                    /* Criando filtro para lista de contatos. Caso o textField esteja vazio ou o conteúdo do textField
-                       não corresponder a nenhum contato da lista, serão exibir todos os contatos. Caso contrário,
-                       apenas os contatos cujo o nome contém a string contida no textField será exibido */
-
-                FilteredList<GridPane> filteredList = new FilteredList<>(gridList,p -> true);
-
-                textField.textProperty().addListener((observable, oldValue, newValue) -> {
-                    if(textField.getText().trim().isEmpty()){
-                        filteredList.setPredicate(gridPane -> true);
-                    } else {
-                        if (newValue != null){
-                            filteredList.setPredicate(gridPane -> {
-                                String nome = ((Label) ((VBox) gridPane.getChildren().
-                                        get(1)).getChildren().get(1)).getText();
-                                return nome.toLowerCase().contains(newValue.toLowerCase());
-                            });
-                        }
-
-                    }
-                    if (listView.getItems().size() == 0){
-                        filteredList.setPredicate(gridPane -> true);
-                    }
-                    listView.getSelectionModel().selectFirst();
-                });
-
-                listView.setItems(filteredList);
-
-                    // Selecionado Primeiro Elemento
-
-                listView.getSelectionModel().selectFirst();
-
-                    // Deixando a lista visível
-
-                listView.setVisible(true);
-
-
-            } else { // Caso em que a lista de Contatos está vazia
-
-                Label label = new Label("Nenhum contato foi adicionado");
-                label.setFont(new Font(tamanhoTela.getWidth() * 0.01354));
-
-                HBox hBox = new HBox();
-                hBox.setAlignment(Pos.CENTER);
-                hBox.getChildren().add(label);
-
-                ((GridPane) root.getCenter()).getChildren().add(hBox);
-                GridPane.setConstraints(hBox,0,1,2,1);
-            }
-
-            // Escondendo Progress Indicator
-
-            spinner.setVisible(false);
-
-        });
-
-            // Iniciando Thread
-
-
-        new Thread(task).start();
 
         
     }
@@ -295,10 +157,21 @@ public class ControllerDashboard {
 
     @FXML
     public void handleAdicionarContato() {
-        Stage stage = (Stage) root.getScene().getWindow();
+
         try {
-            Parent adiconarJanela = FXMLLoader.load(getClass().getResource(URL_JANELA_ADICIONAR));
-            stage.getScene().setRoot(adiconarJanela);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(LOCATION_ADD_CONTACT_VIEW));
+            Parent addView = loader.load();
+            ControllerAddContact controllerAddContact = loader.getController();
+
+            loader = new FXMLLoader(getClass().getResource("/contact_fields.fxml"));
+            loader.load();
+
+            ControllerContactFields controllerContactFields = loader.getController();
+            controllerAddContact.setFields(controllerContactFields);
+
+            AnchorPane containerRoot = (AnchorPane) root.getScene().getRoot();
+            changeView(containerRoot, root, addView, FROM_RIGHT);
+
         } catch (IOException e){
             System.out.println("Erro: " + e.getMessage());
         }
@@ -345,17 +218,17 @@ public class ControllerDashboard {
 
             // Exibindo Confirmação
 
-            Optional<ButtonType> result = exibirAlert(Alert.AlertType.CONFIRMATION,"Confirmação",
+            Optional<ButtonType> result = showAlert(Alert.AlertType.CONFIRMATION,"Confirmação",
                     "Tem certeza que deseja excluir o contato " + nome + "?",
-                    "Clique em Ok para confirmar e em Cancelar para voltar");
+                    "Clique em Ok para confirmar e em Cancelar para voltar", root);
 
 
             if (result.isPresent() && result.get().equals(ButtonType.OK)){
                 Task<Boolean> task = new Task<>() {
                     @Override
                     protected Boolean call() {
-                        DAO<Contact> dao = new ContactDAO(new Contact(intId));
-                        return dao.delete();
+                        DAO<Contact> dao = new ContactDAO();
+                        return dao.delete(intId);
                     }
                 };
 
@@ -364,8 +237,8 @@ public class ControllerDashboard {
                     if (task.getValue()){
                         gridList.remove(gridPane);
                     } else {
-                        exibirAlert(Alert.AlertType.ERROR,"Erro no processamento",nome,
-                                "Ocorreu um erro ao tentar excluir esse contato. Tente mais tarde");
+                        showAlert(Alert.AlertType.ERROR,"Erro no processamento",nome,
+                                "Ocorreu um erro ao tentar excluir esse contato. Tente mais tarde", root);
                     }
                 });
 
@@ -389,8 +262,6 @@ public class ControllerDashboard {
 
         if (gridPane != null){
 
-            // Obtendo Atributos
-
             int intId = Integer.parseInt(((Label) ((VBox) gridPane.getChildren().get(1)).getChildren().get(0)).getText());
 
             String nome = ((Label) ((VBox) gridPane.getChildren().get(1)).getChildren().get(1)).getText();
@@ -407,12 +278,12 @@ public class ControllerDashboard {
                 fxmlLoader = new FXMLLoader(getClass().getResource(URL_JANELA_DETALHES));
                 GridPane root = fxmlLoader.load();
 
-                ControllerDetalhes controllerDetalhes = fxmlLoader.getController();
-                controllerDetalhes.setContact(contact);
+                ControllerContactDetails controllerContactDetails = fxmlLoader.getController();
+                controllerContactDetails.setContact(contact);
 
                 // Inicializando campos com os respectivos atributos
 
-                controllerDetalhes.inicializarCampos();
+                controllerContactDetails.inicializarCampos();
 
                 stage.getScene().setRoot(root);
 
@@ -436,14 +307,8 @@ public class ControllerDashboard {
         }
     }
 
-    // Método auxiliar para exibir os alerts. Foi criado para evitar repetição de código
-
-    private Optional<ButtonType> exibirAlert(Alert.AlertType type, String title, String headerText, String contentText){
-        Alert alert = new Alert(type);
-        alert.initOwner(root.getScene().getWindow());
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-        return alert.showAndWait();
+    public void setupContacts(ObservableList<GridPane> gridList) {
+        this.gridList = gridList;
+        listView.setItems(gridList);
     }
 }

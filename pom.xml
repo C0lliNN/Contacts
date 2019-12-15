@@ -22,16 +22,17 @@
     <build>
 
         <resources>
-
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-
             <resource>
                 <directory>src/main/java/com/raphaelcollin/contacts/view</directory>
             </resource>
             <resource>
                 <directory>src/main/java/com/raphaelcollin/contacts/styles</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java/com/raphaelcollin/contacts/bundles</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java/com/raphaelcollin/contacts/images</directory>
             </resource>
         </resources>
 
@@ -121,7 +122,14 @@
                                 <resource>
                                     <directory>src/main/java/com/raphaelcollin/styles</directory>
                                 </resource>
+                                <resource>
+                                    <directory>src/main/java/com/raphaelcollin/contacts/bundles</directory>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/java/com/raphaelcollin/contacts/images</directory>
+                                </resource>
                             </resources>
+
                         </configuration>
                     </execution>
                 </executions>

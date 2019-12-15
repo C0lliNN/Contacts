@@ -7,6 +7,7 @@
 
 package com.raphaelcollin.contacts.controller;
 
+import com.raphaelcollin.contacts.model.Contact;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
@@ -16,7 +17,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 
-public class ControllerContato {
+/* ListView Item */
+
+public class ControllerContactItem {
     @FXML
     private GridPane root;
     @FXML
@@ -49,37 +52,18 @@ public class ControllerContato {
 
     }
 
-    Label getIdField() {
-        return idField;
-    }
-
-    Label getNomeField() {
-        return nomeField;
-    }
-
-    Label getSexoField() {
-        return sexoField;
-    }
-
-    Label getNumeroField() {
-        return numeroField;
-    }
-
-    Label getEmailField() {
-        return emailField;
-    }
-
-    Label getDescricaoField() {
-        return descricaoField;
-    }
-
-
-    void setImage() {
+    void setupControls(Contact contact) {
+        idField.setText(String.format("%d", contact.getIdContact()));
+        nomeField.setText(contact.getName());
+        sexoField.setText(contact.getGender());
         if (sexoField.getText().equalsIgnoreCase("Masculino")){
             imageView.setImage(new Image(URL_IMAGEM_ICONE_MASCULINO));
         } else {
             imageView.setImage(new Image(URL_IMAGEM_ICONE_FEMININO));
         }
+        numeroField.setText(contact.getPhoneNumber());
+        emailField.setText(contact.getEmail());
+        descricaoField.setText(contact.getDescription());
     }
 
 

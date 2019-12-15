@@ -9,7 +9,9 @@ package com.raphaelcollin.contacts.model.dao;
 
 import com.raphaelcollin.contacts.model.Contact;
 import javafx.collections.ObservableList;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,81 +19,34 @@ import org.junit.jupiter.params.provider.CsvSource;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ContactDAOTest {
 
-    private ObservableList<Contact> testContacts;
-
-    @BeforeEach
-    void setup() {
-        DAO<Contact> dao = new ContactDAO();
-        testContacts = dao.selectAll();
-    }
-
     @ParameterizedTest
-    @CsvSource({"Teste 1, Male, 995977220,teste1@hotmail.com, Testing",
-               "Teste 2, Female, 993212531, teste2@gmai.com, Testing",
-                "Teste 3, Female, 995231252, teste3@yahoo.com, Testing"})
-    @Order(1)
-    void insert(ArgumentsAccessor accessor) {
+    @CsvSource({"Teste, Male, 995977220,teste1@hotmail.com, Testing",
+            "Teste 2, Female, 993212531, teste2@gmai.com, Testing",
+            "Teste 3, Female, 995231252, teste3@yahoo.com, Testing",
+            "Teste 4, Male, 992231252, teste3@yahoo.com, Testing"})
+    void testContactDAO(ArgumentsAccessor accessor) {
+        DAO<Contact> dao = new ContactDAO();
 
         Contact contact = new Contact(accessor.getString(0), accessor.getString(1), accessor.getString(2),
                 accessor.getString(3), accessor.getString(4));
 
-        DAO<Contact> dao = new ContactDAO(contact);
-        int result = dao.insert();
-        Assertions.assertTrue(result >= 0);
 
-    }
+        int generatedId = dao.insert(contact);
+        Assertions.assertTrue(generatedId >= 0);
 
-    @Test
-    @Order(2)
-    void selectAll() {
+        Contact retrievedContact = dao.select(generatedId);
+        Assertions.assertNotNull(retrievedContact);
 
-        Assertions.assertNotNull(testContacts);
-        Assertions.assertFalse(testContacts.isEmpty());;
+        ObservableList<Contact> contacts = dao.selectAll();
+        Assertions.assertNotNull(contacts);
 
-    }
+        contact.setName(contact.getName() + " Updated");
+        boolean result = dao.update(generatedId, contact);
+        Assertions.assertTrue(result);
 
-    @Test
-    @Order(3)
-    void select() {
-
-        Assertions.assertNotNull(testContacts);
-        Assertions.assertFalse(testContacts.isEmpty());;
-
-        for (Contact contact : testContacts) {
-            DAO<Contact> dao = new ContactDAO(contact);
-            Contact resultContact = dao.select();
-            Assertions.assertNotNull(resultContact);
-        }
-
+        result = dao.delete(generatedId);
+        Assertions.assertTrue(result);
     }
 
 
-    @Test
-    @Order(4)
-    void update() {
-
-        Assertions.assertNotNull(testContacts);
-        Assertions.assertFalse(testContacts.isEmpty());;
-
-        for (Contact contact : testContacts) {
-            contact.setName(contact.getName() + "Updated");
-            DAO<Contact> dao = new ContactDAO(contact);
-            boolean result = dao.update();
-            Assertions.assertTrue(result);
-        }
-    }
-
-    @Test
-    @Order(5)
-    void delete() {
-
-        Assertions.assertNotNull(testContacts);
-        Assertions.assertFalse(testContacts.isEmpty());;
-
-        for (Contact contact : testContacts) {
-            DAO<Contact> dao = new ContactDAO(contact);
-            boolean result = dao.delete();
-            Assertions.assertTrue(result);
-        }
-    }
 }

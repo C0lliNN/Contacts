@@ -33,7 +33,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 
-public class ControllerDetalhes {
+public class ControllerContactDetails {
 
     @FXML
     private GridPane root;
@@ -283,13 +283,13 @@ public class ControllerDetalhes {
                 Contact newContact = new Contact(nomeField.getText(), ((ToggleButton) radioGroup.getSelectedToggle()).getText(), numeroField.getText(),
                         emailField.getText(), descricaoField.getText());
 
-                DAO<Contact> dao = new ContactDAO(newContact);
+                DAO<Contact> dao = new ContactDAO();
 
                 Task<Boolean> task = new Task<Boolean>() {
                     @Override
                     protected Boolean call(){
                         root.setCursor(Cursor.WAIT);
-                        return dao.update();
+                        return dao.update(contact.getIdContact(), newContact);
                     }
                 };
 

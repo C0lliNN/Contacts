@@ -9,15 +9,12 @@ package com.raphaelcollin.contacts.model.dao;
 
 import javafx.collections.ObservableList;
 
-import java.sql.Connection;
+public interface DAO<T> {
 
-public abstract class DAO<T> {
-    protected Connection connection;
-
-    public abstract int insert();
-    public abstract T select();
-    public abstract ObservableList<T> selectAll();
-    public abstract boolean update();
-    public abstract boolean delete();
+    int insert(T data);
+    T select(int id);
+    ObservableList<T> selectAll();
+    boolean update(int id, T data);
+    boolean delete(int id);
 
 }

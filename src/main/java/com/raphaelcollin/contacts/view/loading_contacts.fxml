@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+  ~ /**
+  ~ * @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+  ~ * @copyright (c) 2019
+  ~ */
+  -->
+
+<VBox fx:id="root" alignment="CENTER" fx:controller="com.raphaelcollin.contacts.controller.ControllerLoading" xmlns:fx="http://javafx.com/fxml">
+
+    <ProgressIndicator fx:id="indicator"/>
+    <Label fx:id="label" text="%loading_contacts_label" />
+
+</VBox>

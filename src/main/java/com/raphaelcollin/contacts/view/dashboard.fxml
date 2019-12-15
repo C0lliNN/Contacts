@@ -33,29 +33,12 @@
 
                 <!-- List View -->
 
-            <ListView visible="false" fx:id="listView" onKeyPressed="#handleKeyPressed"
+            <ListView fx:id="listView" onKeyPressed="#handleKeyPressed"
                          onMouseClicked="#handleListDoubleClick" GridPane.vgrow="ALWAYS"
                          GridPane.hgrow="ALWAYS"/>
 
-                <!-- Proggress Indicator -->
 
-            <Spinner fx:id="spinner"/>
         </GridPane>
 
     </center>
-
-    <bottom>
-
-            <!-- Botões Abrir Contato e Excluir Contato -->
-
-        <GridPane alignment="CENTER">
-
-            <Button text="Excluir Contato" fx:id="excluirButton"
-                       onAction="#handleExcluirContato" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-
-            <Button text="Abrir Contato" fx:id="abrirButton" defaultButton="true"
-                       onAction="#handleAbrirContato" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-        </GridPane>
-    </bottom>
 </BorderPane>

@@ -15,9 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-public class ContactDAO extends DAO<Contact>{
-
-    private Contact contact;
+public class ContactDAO implements DAO<Contact>{
 
     private static final String TABLE_CONTACTS_DB = "contacts";
     private static final String COLUMN_IDCONTACT_DB = "idContact";
@@ -27,17 +25,8 @@ public class ContactDAO extends DAO<Contact>{
     private static final String COLUMN_EMAIL_DB = "email";
     private static final String COLUMN_DESCRIPTION_DB = "description";
 
-    public ContactDAO(Contact contact) {
-        this.contact = contact;
-    }
-
-    public ContactDAO() {
-        this(null);
-    }
-
     @Override
-    public int insert() {
-        connection = openConnection();
+    public int insert(Contact contact) {
 
         StringBuilder query = new StringBuilder("INSERT INTO ");
         query.append(TABLE_CONTACTS_DB);
@@ -49,7 +38,9 @@ public class ContactDAO extends DAO<Contact>{
         query.append(COLUMN_DESCRIPTION_DB).append(") ");
         query.append("VALUES (?,?,?,?,?)");
 
-        try (PreparedStatement statement = connection.prepareStatement(query.toString(),PreparedStatement.RETURN_GENERATED_KEYS)) {
+        Connection connection = openConnection();
+
+        try (PreparedStatement statement = connection.prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, contact.getName());
             statement.setString(2, contact.getGender());
             statement.setString(3, contact.getPhoneNumber());
@@ -62,7 +53,6 @@ public class ContactDAO extends DAO<Contact>{
             resultSet.next();
 
             int generatedId = resultSet.getInt(1);
-
             resultSet.close();
 
             return generatedId;
@@ -71,14 +61,12 @@ public class ContactDAO extends DAO<Contact>{
             System.err.println("Erro: " + e.getMessage());
             return -1;
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
     }
 
     @Override
-    public Contact select() {
-
-        connection = openConnection();
+    public Contact select(int id) {
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT ");
@@ -94,11 +82,11 @@ public class ContactDAO extends DAO<Contact>{
         query.append(COLUMN_IDCONTACT_DB);
         query.append(" = ?");
 
+        Connection connection = openConnection();
 
-        try (PreparedStatement statement = connection.prepareStatement(query.toString(), PreparedStatement.RETURN_GENERATED_KEYS)){
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())){
 
-            statement.setInt(1, contact.getIdContact());
-            System.out.println(statement);
+            statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             resultSet.next();
 
@@ -114,13 +102,12 @@ public class ContactDAO extends DAO<Contact>{
             System.out.println("Erro: " + e.getMessage());
             return null;
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
     }
 
     @Override
     public ObservableList<Contact> selectAll() {
-        connection = openConnection();
 
         StringBuilder query = new StringBuilder();
         query.append("SELECT ");
@@ -134,6 +121,8 @@ public class ContactDAO extends DAO<Contact>{
         query.append(TABLE_CONTACTS_DB);
         query.append(" ORDER BY ");
         query.append(COLUMN_NAME_DB);
+
+        Connection connection = openConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(query.toString());
              ResultSet resultSet = statement.executeQuery()) {
@@ -155,8 +144,7 @@ public class ContactDAO extends DAO<Contact>{
     }
 
     @Override
-    public boolean update() {
-        connection = openConnection();
+    public boolean update(int id, Contact contact) {
 
         StringBuilder query = new StringBuilder();
         query.append("UPDATE ");
@@ -170,6 +158,7 @@ public class ContactDAO extends DAO<Contact>{
         query.append(" WHERE ");
         query.append(COLUMN_IDCONTACT_DB).append(" = ?");
 
+        Connection connection = openConnection();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
 
@@ -178,9 +167,8 @@ public class ContactDAO extends DAO<Contact>{
             preparedStatement.setString(3, contact.getPhoneNumber());
             preparedStatement.setString(4, contact.getEmail());
             preparedStatement.setString(5, contact.getDescription());
-            preparedStatement.setInt(6, contact.getIdContact());
+            preparedStatement.setInt(6, id);
 
-            System.out.println(preparedStatement);
             preparedStatement.execute();
 
             return true;
@@ -188,33 +176,35 @@ public class ContactDAO extends DAO<Contact>{
             System.err.println("Erro: " + e.getMessage());
             return false;
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
     }
 
     @Override
-    public boolean delete() {
-        connection = openConnection();
+    public boolean delete(int id) {
         String query = "DELETE FROM " + TABLE_CONTACTS_DB + " WHERE " + COLUMN_IDCONTACT_DB + " = ?";
+
+        Connection connection = openConnection();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setInt(1,contact.getIdContact());
+            statement.setInt(1, id);
             statement.execute();
             return true;
         } catch (Exception e){
             System.out.println("Erro: " + e.getMessage());
             return false;
         } finally {
-            closeConnection();
+            closeConnection(connection);
         }
     }
+
 
     private Connection openConnection() {
         return ConnectionFactory.getConnection();
     }
 
-    private void closeConnection(){
+    private void closeConnection(Connection connection){
         ConnectionFactory.closeConnection(connection);
     }
 }

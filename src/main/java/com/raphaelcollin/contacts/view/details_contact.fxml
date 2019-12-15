@@ -11,7 +11,7 @@
   -->
 
 <GridPane fx:id="root" xmlns:fx="http://javafx.com/fxml"
-          fx:controller="com.raphaelcollin.contacts.controller.ControllerDetalhes" alignment="TOP_CENTER">
+          fx:controller="com.raphaelcollin.contacts.controller.ControllerContactDetails" alignment="TOP_CENTER">
 
     <!-- Imagem -->
 

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<!--
+  ~ /**
+  ~ * @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
+  ~ * @copyright (c) 2019
+  ~ */
+  -->
+
+<GridPane xmlns="http://javafx.com/javafx" fx:id="root"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.raphaelcollin.contacts.controller.ControllerContactFields">
+
+    <!-- Nome -->
+
+    <Label text="Nome:" fx:id="nameLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="1"
+           GridPane.columnIndex="0"/>
+    <TextField promptText="Nome do Contato" fx:id="nameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+    <!-- Sexo -->
+
+    <Label text="Sexo:" fx:id="genderLabel" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+
+    <!-- Toggle Group -->
+
+    <fx:define>
+        <ToggleGroup fx:id="radioGroup"/>
+    </fx:define>
+
+    <!-- Radio Buttons-->
+
+    <HBox fx:id="hBoxRadio" GridPane.rowIndex="2" GridPane.columnIndex="1">
+        <RadioButton text="Masculino" fx:id="maleRadio" selected="true" toggleGroup="$radioGroup"/>
+        <RadioButton text="Feminino" fx:id="femaleRadio" toggleGroup="$radioGroup"/>
+    </HBox>
+
+    <!-- Número -->
+
+    <Label text="Número:" fx:id="numberLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="3"
+           GridPane.columnIndex="0"/>
+
+    <TextField promptText="Número do Contato" fx:id="numberField" GridPane.rowIndex="3"
+               GridPane.columnIndex="1"/>
+
+    <!-- E-mail -->
+
+    <Label text="E-mail:" fx:id="emailLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="4"
+           GridPane.columnIndex="0"/>
+
+    <TextField promptText="exemplo@exemplo.com" fx:id="emailField" GridPane.rowIndex="4"
+               GridPane.columnIndex="1"/>
+
+    <!-- Descrição -->
+
+    <Label text="Descrição: (Opcional)" fx:id="descriptionLabel" GridPane.rowIndex="5" GridPane.columnIndex="0"
+           GridPane.columnSpan="2"/>
+
+    <TextArea promptText="Descreva o Contato" fx:id="descriptionField" wrapText="true" GridPane.rowIndex="6"
+              GridPane.columnIndex="0" GridPane.columnSpan="2"/>
+
+</GridPane>
