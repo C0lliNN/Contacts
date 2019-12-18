@@ -10,15 +10,12 @@ package com.raphaelcollin.contacts.model;
 
 public class Contact {
 
-
     private int idContact = -1;
     private String name;
     private String gender;
     private String phoneNumber;
     private String email;
     private String description;
-
-        // Construtores
 
     public Contact(int idContact, String name, String gender, String phoneNumber, String email, String description) {
         this.idContact = idContact;

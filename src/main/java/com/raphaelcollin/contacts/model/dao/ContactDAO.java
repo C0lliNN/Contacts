@@ -25,10 +25,12 @@ public class ContactDAO implements DAO<Contact>{
     private static final String COLUMN_EMAIL_DB = "email";
     private static final String COLUMN_DESCRIPTION_DB = "description";
 
+    private StringBuilder query;
+
     @Override
     public int insert(Contact contact) {
 
-        StringBuilder query = new StringBuilder("INSERT INTO ");
+        query = new StringBuilder("INSERT INTO ");
         query.append(TABLE_CONTACTS_DB);
         query.append(" (");
         query.append(COLUMN_NAME_DB).append(",");
@@ -68,7 +70,7 @@ public class ContactDAO implements DAO<Contact>{
     @Override
     public Contact select(int id) {
 
-        StringBuilder query = new StringBuilder();
+        query = new StringBuilder();
         query.append("SELECT ");
         query.append(COLUMN_IDCONTACT_DB).append(",");
         query.append(COLUMN_NAME_DB).append(",");
@@ -109,7 +111,7 @@ public class ContactDAO implements DAO<Contact>{
     @Override
     public ObservableList<Contact> selectAll() {
 
-        StringBuilder query = new StringBuilder();
+        query = new StringBuilder();
         query.append("SELECT ");
         query.append(COLUMN_IDCONTACT_DB).append(",");
         query.append(COLUMN_NAME_DB).append(",");
@@ -146,7 +148,7 @@ public class ContactDAO implements DAO<Contact>{
     @Override
     public boolean update(int id, Contact contact) {
 
-        StringBuilder query = new StringBuilder();
+        query = new StringBuilder();
         query.append("UPDATE ");
         query.append(TABLE_CONTACTS_DB);
         query.append(" SET ");
@@ -201,10 +203,10 @@ public class ContactDAO implements DAO<Contact>{
 
 
     private Connection openConnection() {
-        return ConnectionFactory.getConnection();
+        return DBConnection.getInstance().getConnection();
     }
 
     private void closeConnection(Connection connection){
-        ConnectionFactory.closeConnection(connection);
+        DBConnection.getInstance().closeConnection(connection);
     }
 }

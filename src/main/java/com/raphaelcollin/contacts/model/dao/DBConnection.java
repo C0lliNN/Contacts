@@ -11,11 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-    /* Conexão com o Banco de Dados */
-
-        // Altere o USER e PASS de acordo com as configurações do Banco a ser acessado
-
-public class ConnectionFactory {
+public class DBConnection {
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String PORT = "3306";
     private static final String DB_NAME = "contacts";
@@ -23,26 +19,31 @@ public class ConnectionFactory {
     private static final String USER = "root";
     private static final String PASS = "root";
 
-    // Obtendo Conexão
 
-    public static Connection getConnection() {
+    private static class SingletonHelper{
+        private static DBConnection instance = new DBConnection();
+    }
+
+    public static DBConnection getInstance() {
+        return SingletonHelper.instance;
+    }
+
+    public Connection getConnection() {
         try {
             Class.forName(DRIVER);
             return DriverManager.getConnection(URL, USER, PASS);
         } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Erro: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
             return null;
         }
     }
 
-    // Fechando a Conexão
-
-    public static void closeConnection(Connection connection) {
+    public void closeConnection(Connection connection) {
         if (connection != null) {
             try {
                 connection.close();
             } catch (Exception e) {
-                System.out.println("Erro: " + e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         }
     }

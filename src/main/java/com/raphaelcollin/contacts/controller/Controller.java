@@ -7,10 +7,9 @@
 
 package com.raphaelcollin.contacts.controller;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
@@ -25,6 +24,8 @@ public abstract class Controller {
 
     public static final int FROM_LEFT = 1;
     public static final int FROM_RIGHT = 2;
+
+    private Timeline timeline = new Timeline();
 
     Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 
@@ -45,7 +46,7 @@ public abstract class Controller {
         return alert.showAndWait();
     }
 
-    protected void changeView(AnchorPane containerRoot, Parent outRoot, Parent inRoot, int option) {
+    protected void changeView(AnchorPane containerRoot, Parent outRoot, Parent inRoot, int option, EventHandler<ActionEvent> actionEvent) {
 
         double translateXInRoot;
         double translateXOutRoot;
@@ -67,10 +68,11 @@ public abstract class Controller {
         KeyValue keyValue2 = new KeyValue(outRoot.translateXProperty(), translateXOutRoot);
         KeyFrame frame1 = new KeyFrame(Duration.millis(800), keyValue1, keyValue2);
 
-        Timeline timeline = new Timeline(frame1);
+        timeline.getKeyFrames().setAll(frame1);
+
+        timeline.setOnFinished(actionEvent);
+
         timeline.play();
 
-
     }
-
 }

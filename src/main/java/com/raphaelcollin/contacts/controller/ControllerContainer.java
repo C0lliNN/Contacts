@@ -22,6 +22,7 @@ public class ControllerContainer extends Controller implements Initializable {
     private AnchorPane root;
 
     private static final String LOCATION_LOADING_VIEW = "/loading_contacts.fxml";
+    private static final String ROOT_ID = "container";
 
     private ResourceBundle bundle;
 
@@ -32,6 +33,8 @@ public class ControllerContainer extends Controller implements Initializable {
         root.setMaxSize(getRootWidth(), getRootHeight());
 
         this.bundle = resourceBundle;
+
+        root.setId(ROOT_ID);
 
     }
 
@@ -47,7 +50,7 @@ public class ControllerContainer extends Controller implements Initializable {
             AnchorPane.setBottomAnchor(loadingView, 0.0);
 
             ControllerLoading controller = loader.getController();
-            controller.getContactsList();
+            controller.getContactsList(false);
 
         } catch (IOException e) {
             e.printStackTrace();

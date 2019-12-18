@@ -15,7 +15,7 @@
 <GridPane xmlns:fx="http://javafx.com/fxml" fx:id="root"
           fx:controller="com.raphaelcollin.contacts.controller.ControllerContactItem">
 
-    <ImageView fx:id="imageView" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="0"/>
+    <ImageView fx:id="genderImageView" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="0"/>
 
     <VBox alignment="CENTER_LEFT" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="1">
         <Label fx:id="idField" visible="false">
@@ -23,25 +23,30 @@
                 <Font size="1"/>
             </font>
         </Label>
-        <Label fx:id="nomeField" style="-fx-text-fill: #333333"/>
-        <Label fx:id="sexoField" visible="false">
+        <Label fx:id="nameField"/>
+        <Label fx:id="genderField" visible="false">
             <font>
                 <Font size="1"/>
             </font>
         </Label>
-        <Label fx:id="numeroField" style="-fx-text-fill: #7a7a7a"/>
+        <Label fx:id="numberField"/>
         <Label fx:id="emailField" visible="false">
             <font>
                 <Font size="1"/>
             </font>
         </Label>
 
-        <Label fx:id="descricaoField" visible="false">
+        <Label fx:id="descriptionField" visible="false">
             <font>
                 <Font size="1"/>
             </font>
         </Label>
 
     </VBox>
+
+    <HBox alignment="CENTER_RIGHT" GridPane.rowIndex="0" GridPane.rowSpan="2" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS">
+        <Button fx:id="deleteButton" />
+    </HBox>
+
 
 </GridPane>

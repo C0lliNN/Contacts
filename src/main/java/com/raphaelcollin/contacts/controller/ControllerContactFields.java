@@ -10,7 +10,6 @@ package com.raphaelcollin.contacts.controller;
 import com.raphaelcollin.contacts.model.Contact;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
@@ -18,12 +17,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Screen;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ControllerContactFields implements Initializable {
+public class ControllerContactFields extends Controller implements Initializable {
 
     @FXML
     private GridPane root;
@@ -54,19 +52,35 @@ public class ControllerContactFields implements Initializable {
     @FXML
     private HBox hBoxRadio;
 
+    private ResourceBundle resource;
+
     private static final String EMAIL_REG_EXP = "(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
     private static final String NUM_REG_EXP = "\\d{8,12}";
     private static final int MAX_TEXTAREA_LENGTH = 245;
     private static final String CLASS_FIELD = "adicionar-field";
-    private static final String CLASS_RED_BORDER = "borda-vermelha";
+    private static final String CLASS_RED_BORDER = "red-border";
+
+    private static final String BUNDLE_KEY_ERROR_MESSAGE1 = "contact_fields_error_message1";
+    private static final String BUNDLE_KEY_ERROR_MESSAGE2 = "contact_fields_error_message2";
+    private static final String BUNDLE_KEY_ERROR_MESSAGE3 ="contact_fields_error_message3" ;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Rectangle2D tamanhoTela = Screen.getPrimary().getVisualBounds();
-        root.setVgap(tamanhoTela.getHeight() * 0.018518);
-        hBoxRadio.setSpacing(tamanhoTela.getWidth() * 0.0052083);
 
-        double tamanhoFonte = tamanhoTela.getWidth() * 0.01145;
+        this.resource = resourceBundle;
+
+        double width = getRootWidth();
+        double height = getRootHeight();
+
+        root.setPrefWidth(width - 100);
+        root.setMinWidth(width - 100);
+        root.setMaxWidth(width - 100);
+
+        root.setVgap(height * 0.0375375);
+        root.setHgap(width * 0.0333333);
+        hBoxRadio.setSpacing(width * 0.0208333);
+
+        double tamanhoFonte = width * 0.0333333;
 
         nameLabel.setFont(new Font(tamanhoFonte));
         nameField.setFont(new Font(tamanhoFonte));
@@ -138,45 +152,57 @@ public class ControllerContactFields implements Initializable {
     }
 
     public void clear() {
-        nameField.setText("");
+        nameField.clear();
         radioGroup.selectToggle(maleRadio);
-        numberField.setText("");
-        emailField.setText("");
-        descriptionField.setText("");
+        numberField.clear();
+        emailField.clear();
+        descriptionField.clear();
+
+        emailField.getStyleClass().remove(CLASS_RED_BORDER);
+        numberField.getStyleClass().remove(CLASS_RED_BORDER);
+
+        nameField.requestFocus();
+
     }
 
     public Contact buildContactFromFields() throws Exception {
-        String erro = null;
-        boolean erroEncontrado = false;
-        if (nameField.getText().isEmpty() || numberField.getText().isEmpty() || emailField.getText().isEmpty()){
-            erro = "Existem campos Obrigatórios que não foram preenchidos!";
-            erroEncontrado = true;
+        String errorMessage = null;
+        boolean errorFounded = false;
+        if (nameField.getText().isEmpty() || numberField.getText().isEmpty()){
+            errorMessage = resource.getString(BUNDLE_KEY_ERROR_MESSAGE1);
+            errorFounded = true;
         }
 
-        if (!erroEncontrado && !numberField.getText().matches(NUM_REG_EXP)){
-            erro = "O campo número não possui um valor válido!";
-            erroEncontrado = true;
+        if (!errorFounded && !numberField.getText().matches(NUM_REG_EXP)){
+            errorMessage = resource.getString(BUNDLE_KEY_ERROR_MESSAGE2);
+            errorFounded = true;
         }
-        if (!erroEncontrado && !emailField.getText().matches(EMAIL_REG_EXP)){
-            erro = "O campo email não possui um valor válido!";
-            erroEncontrado = true;
+        if (!errorFounded && !emailField.getText().isEmpty() && !emailField.getText().matches(EMAIL_REG_EXP)){
+            errorMessage = resource.getString(BUNDLE_KEY_ERROR_MESSAGE3);
+            errorFounded = true;
         }
 
-        if (!erroEncontrado) {
-            String nome = nameField.getText();
-            String sexo = ((RadioButton) radioGroup.getSelectedToggle()).getText();
-            String numero = numberField.getText();
-            String email = emailField.getText();
-            String descricao;
-            if (descriptionField.getText().isEmpty()) {
-                descricao = null;
-            } else {
-                descricao = descriptionField.getText();
-            }
-            return new Contact(nome, sexo, numero, email, descricao);
+        if (!errorFounded) {
+
+            String name = nameField.getText();
+            String gender = ((RadioButton) radioGroup.getSelectedToggle()).getText();
+            String number = numberField.getText();
+            String email = emailField.getText().isEmpty() ? null : emailField.getText();;
+            String description = descriptionField.getText().isEmpty() ? null : descriptionField.getText();
+
+            return new Contact(name, gender, number, email, description);
 
         } else  {
-            throw new Exception(erro);
+            throw new Exception(errorMessage);
         }
+    }
+
+    public void setFieldsText(Contact contact) {
+        nameField.setText(contact.getName());
+        numberField.setText(contact.getPhoneNumber());
+        radioGroup.selectToggle(contact.getGender().equals("Male") ? maleRadio : femaleRadio);
+        emailField.setText(contact.getEmail() == null ? "" : contact.getEmail());
+        descriptionField.setText(contact.getDescription() == null ? "" : contact.getDescription());
+        nameField.requestFocus();
     }
 }

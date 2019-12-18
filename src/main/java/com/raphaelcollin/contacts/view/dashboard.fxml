@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.image.ImageView?>
 <!--
   ~ /**
   ~ * @author <Raphael Collin> <rapphaelmanhaes2017@hotmail.com>
@@ -17,13 +16,9 @@
     <top>
         <AnchorPane>
 
-            <!-- Text Field da Janela Principal -->
+            <TextField promptText="%dashboard_textfield_promt_text" fx:id="textField"/>
 
-            <TextField promptText="Pesquisar Contato" fx:id="textField"/>
-
-            <!-- Botão de adicionar novo Contato -->
-
-            <ImageView fx:id="imageView" onMouseClicked="#handleAdicionarContato"/>
+            <Button fx:id="addButton" onMouseClicked="#handleAddContact"/>
 
         </AnchorPane>
     </top>
@@ -31,12 +26,7 @@
     <center>
         <GridPane>
 
-                <!-- List View -->
-
-            <ListView fx:id="listView" onKeyPressed="#handleKeyPressed"
-                         onMouseClicked="#handleListDoubleClick" GridPane.vgrow="ALWAYS"
-                         GridPane.hgrow="ALWAYS"/>
-
+            <ListView fx:id="listView" GridPane.vgrow="ALWAYS" GridPane.hgrow="ALWAYS"/>
 
         </GridPane>
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <!--
   ~ /**
@@ -13,68 +12,27 @@
 <GridPane fx:id="root" xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.raphaelcollin.contacts.controller.ControllerContactDetails" alignment="TOP_CENTER">
 
-    <!-- Imagem -->
-
     <HBox alignment="CENTER" GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.columnSpan="2">
-        <ImageView fx:id="imageView"/>
+        <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <Button fx:id="backButton" onAction="#handleBack"/>
+        </HBox>
+        <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+            <Button fx:id="iconContactButton"/>
+        </HBox>
+        <HBox HBox.hgrow="ALWAYS">
+            <Button text="Test" opacity="0.0"/>
+        </HBox>
+
     </HBox>
 
+    <GridPane hgap="30" alignment="CENTER" GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="2">
+        <Button text="%add_contact_clearButton_text" fx:id="clearButton" onAction="#handleClear"
+                GridPane.rowIndex="0" GridPane.columnIndex="0" GridPane.hgrow="NEVER"/>
 
-    <!-- Nome -->
-
-    <Label text="Nome:" fx:id="nomeLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="1"
-           GridPane.columnIndex="0"/>
-
-    <TextField promptText="Nome do Contato" fx:id="nomeField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-
-    <!-- Sexo -->
-
-    <Label text="Sexo:" fx:id="sexoLabel" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-
-    <fx:define>
-        <ToggleGroup fx:id="radioGroup"/>
-    </fx:define>
-
-    <!-- Radio Buttons -->
-
-    <HBox fx:id="hBoxRadio" GridPane.rowIndex="2" GridPane.columnIndex="1">
-        <RadioButton text="Masculino" fx:id="masculinoRadio" selected="true" toggleGroup="$radioGroup"/>
-        <RadioButton text="Feminino" fx:id="femininoRadio" toggleGroup="$radioGroup"/>
-    </HBox>
-
-
-    <!-- Numero -->
-
-    <Label text="Número:" fx:id="numeroLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="3"
-           GridPane.columnIndex="0"/>
-
-    <TextField promptText="Número do Contato" fx:id="numeroField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-
-    <!-- E-mail -->
-
-    <Label text="E-mail:" fx:id="emailLabel" onMouseClicked="#handleLabelClick" GridPane.rowIndex="4"
-           GridPane.columnIndex="0"/>
-
-    <TextField promptText="exemplo@exemplo.com" fx:id="emailField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-
-    <!-- Descrição -->
-
-    <Label text="Descrição: (Opcional)" fx:id="descricaoLabel" GridPane.rowIndex="5" GridPane.columnIndex="0"
-           GridPane.columnSpan="2"/>
-
-    <TextArea promptText="Descreva o Contato"  wrapText="true" fx:id="descricaoField" GridPane.rowIndex="6"
-              GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-
-    <!-- Botões -->
-
-    <GridPane alignment="CENTER" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.columnSpan="2">
-
-        <Button text="Voltar" fx:id="voltarButton" onAction="#handleVoltar"
-                   GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-
-        <Button text="Salvar" fx:id="salvarButton" disable="true" defaultButton="true"
-                   onAction="#handleSalvar" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+        <Button text="%contact_details_save_button_text" fx:id="saveButton" onAction="#handleSave" defaultButton="true"
+                GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.hgrow="NEVER" />
 
     </GridPane>
+
 
 </GridPane>

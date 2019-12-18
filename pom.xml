@@ -168,20 +168,20 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.fxmisc.cssfx</groupId>
+            <artifactId>cssfx</artifactId>
+            <version>11.1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.15</version>
         </dependency>
 
         <dependency>
-            <groupId>io.github.typhon0</groupId>
-            <artifactId>AnimateFX</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-dashicons-pack</artifactId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
             <version>11.3.4</version>
         </dependency>
         <dependency>

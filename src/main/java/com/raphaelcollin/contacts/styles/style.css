@@ -6,105 +6,116 @@
  */
 
 
-    /* Background da aplicação */
-
-.root {
-    -fx-background-color: #fcfcfc;
+#container {
+    -fx-background-color: linear-gradient(to bottom, #f7f7f7, #fafafa);
 }
 
-.jfx-button:hover, #imagem-adicionar-contato:hover {
+.button {
     -fx-cursor: hand;
 }
 
-/* Configuração dos Botões Abrir Contato, Adicionar Contato e Editar */
-
-.botao-azul {
-     -jfx-button-type: RAISED;
-     -fx-background-color: #5164ae;
-     -fx-text-fill: white;
-     -fx-background-radius: 0;
-}
-
-/* Configuração dos Botões Excluir Contato e voltar*/
-
-.botao-laranja {
-     -jfx-button-type: RAISED;
-     -fx-background-color: #ff7f02;
-     -fx-text-fill: white;
-     -fx-background-radius: 0;
-}
-
-/* Configuração do Ícone de Adicionar Contato da Janela Principal */
-
-#imagem-adicionar-contato {
+#add-contact {
     -fx-background-color: #00ff2e;
     -fx-background-radius: 100%;
-    -fx-border: 0;
-
-    -fx-text-alignment: CENTER;
 }
 
-    /* Configuração dos Fields */
+#add-contact:hover {
+    -fx-background-color: #00e629;
+}
 
 .text-field, .text-area {
     -fx-background-insets: 0;
-    -fx-prompt-text-fill: derive(-fx-control-inner-background,-30%);
+    -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
     -fx-text-box-border: transparent;
 }
 
 .text-field:focused, .text-area:focused {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
-    -fx-prompt-text-fill: derive(-fx-control-inner-background,-30%);
-}
-    /* Essa classe será adicionada quando algum campo for inválido */
-
-.borda-vermelha {
-    -fx-border-color: red;
+    -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
 }
 
-    /* Configurações da List View */
-
-.jfx-list-view {
+.list-view {
     -fx-background-insets: 0;
-    -jfx-cell-horizontal-margin: 0.0;
-    -jfx-expanded: false;
-    -fx-background-color: #fbfbfb;
+    -fx-background-color: transparent;
 }
 
-.jfx-list-cell {
+.contact-item-number-label {
+    -fx-text-fill: #666666;
+}
+.list-view .indexed-cell:even:filled {
+    -fx-background-color: #cccbca;
+}
+
+.list-view .indexed-cell:odd:filled {
+    -fx-background-color: #dbdbdb;
+}
+
+.list-view .cell:filled:hover {
+    -fx-cursor: hand;
+    -fx-background-color: #5164ae;
+}
+
+.list-view .cell:filled:hover .contact-item-name-label, .list-view .cell:filled:hover .contact-item-number-label{
+    -fx-text-fill: white;
+}
+
+.list-view .list-cell {
     -fx-background-insets: 0.0;
     -fx-border-width: 0 0 1 0;
     -fx-border-color: #8e8e8e;
     -fx-border-style: dotted;
 }
 
-.jfx-list-cell:empty{
+.list-view .list-cell:empty {
     -fx-border-width: 0;
 }
 
-.jfx-list-cell-container {
-    -fx-alignment: center-left;
-
+#delete-button {
+    -fx-background-color: #f50202;
+    -fx-background-radius: 100%;
 }
 
-.jfx-list-cell:odd, .jfx-list-cell:even {
-    -fx-background-color: #f5f5f5;
-
+#delete-button:hover {
+    -fx-background-color: #e60202;
 }
 
-.jfx-list-cell:filled:hover {
-    -fx-background-color: #f7f7f7;
-    -fx-text-fill: black;
+.back-button {
+    -fx-padding: 0;
+    -fx-background-radius: 100%;
+    -fx-background-color: #e3e302;
 }
 
-.jfx-list-cell:odd:selected > .jfx-rippler > StackPane, .jfx-list-cell:even:selected > .jfx-rippler > StackPane {
+.back-button:hover {
+    -fx-background-color: #d4d402;
+}
+
+.blue-button {
     -fx-background-color: #5164ae;
-    -fx-border-width: 0 0 1 0;
-    -fx-border-color: #8e8e8e;
-    -fx-border-style: dotted;
+    -fx-text-fill: white;
 }
 
-.jfx-list-cell .jfx-rippler {
-    -jfx-rippler-fill: #97c7e2;
+.blue-button:hover {
+    -fx-background-color: #5f74c9
 }
+
+.orange-button {
+    -fx-background-color: #ff7f02;
+    -fx-text-fill: white;
+}
+
+.orange-button:hover {
+    -fx-background-color: #e67100;
+}
+
+.radio-button .radio{
+    -fx-background-color: transparent;
+    -fx-border-width: 1;
+    -fx-border-radius: 50%;
+    -fx-border-color: black;
+}
+
+.red-border {
+    -fx-border-color: red;
+}
+

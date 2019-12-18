@@ -8,26 +8,26 @@
 package com.raphaelcollin.contacts.controller;
 
 import com.raphaelcollin.contacts.model.Contact;
-import com.raphaelcollin.contacts.model.dao.ContactDAO;
 import com.raphaelcollin.contacts.model.dao.DAO;
+import com.raphaelcollin.contacts.model.dao.DAOFactory;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,95 +36,113 @@ import java.util.ResourceBundle;
 
 public class ControllerAddContact extends Controller implements Initializable {
 
-
     @FXML
     private GridPane root;
     @FXML
-    private ImageView imageView;
+    private Button iconContactButton;
     @FXML
-    private Button voltarButton;
+    private Button backButton;
     @FXML
-    private Button adicionarButton;
+    private Button clearButton;
+    @FXML
+    private Button addButton;
 
-    private ControllerContactFields fields;
+    private ControllerContactFields controllerContactFields;
 
-    // Tamanho atual da tela
+    private ResourceBundle resources;
 
-    private Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
+    private static final String CLASS_CLEAR_BUTTON = "orange-button";
+    private static final String CLASS_ADD_BUTTON = "blue-button";
+    private static final String CLASS_BACK_BUTTON = "back-button";
+    private static final String LOCATION_CONTACT_FIELDS_VIEW = "/contact_fields.fxml";
+    private static final String LOCATION_LOADING_VIEW = "/loading_contacts.fxml";
 
-    /* CONSTANTES */
-
-    // Quantidade máxima de caracteres permitidos no textArea Descrição
-    private static final int MAX_TEXTAREA_LENGTH = 245;
-
-    // Regex de validação do campo email
-    private static final String EMAIL_REG_EXP = "(?i)^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
-
-    // Regex de validação do campo número
-    private static final String NUM_REG_EXP = "\\d{8,12}";
-
-    private static final String URL_IMAGEM_ICONE = "file:arquivos/add-contact.png";
-    private static final String CLASSE_BOTAO_VOLTAR = "botao-laranja";
-    private static final String CLASSE_BOTAO_ADICIONAR = "botao-azul";
-    private static final String CLASSE_FIELD = "adicionar-field";
-    private static final String CLASSE_BORDA_VERMELHA = "borda-vermelha";
-    private static final String URL_JANELA_PRINCIPAL = "/dashboard.fxml";
+    private static final String BUNDLE_KEY_ALERT_INFORMATION_TITLE = "add_contact_alert_information_title";
+    private static final String BUNDLE_KEY_ALERT_INFORMATION_HEADER_TEXT = "add_contact_alert_information_header_text";
+    private static final String BUNDLE_KEY_ALERT_INFORMATION_CONTENT_TEXT = "add_contact_alert_information_content_text";
+    private static final String BUNDLE_KEY_ALERT_ERROR_TITLE = "alert_error_title";
+    private static final String BUNDLE_KEY_ALERT1_ERROR_HEADER_TEXT = "add_contact_alert_error1_header_text";
+    private static final String BUNDLE_KEY_ALERT1_ERROR_CONTENT_TEXT = "add_contact_alert_error1_content_text";
+    private static final String BUNDLE_KEY_ALERT2_ERROR_HEADER_TEXT = "add_contact_alert_error2_header_text";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        // Padding, Gaps e Spacing
+        this.resources = resourceBundle;
 
-        root.setPadding(new Insets(tamanhoTela.getHeight() * 0.018518, tamanhoTela.getWidth() * 0.026041,
-                tamanhoTela.getHeight() * 0.018518, tamanhoTela.getWidth() * 0.026041));
-        root.setHgap(tamanhoTela.getWidth() * 0.0052083);
-        root.setVgap(tamanhoTela.getHeight() * 0.018518);
+        double width = getRootWidth();
+        double height = getRootHeight();
 
-        // Alinhando e definindo tamanho de controles
+        root.setPrefSize(width, height);
+        root.setMinSize(width, height);
+        root.setMaxSize(width, height);
 
-        imageView.setImage(new Image(URL_IMAGEM_ICONE));
-        imageView.setFitWidth(tamanhoTela.getWidth() * 0.06);
-        imageView.setFitHeight(tamanhoTela.getWidth() * 0.06);
+        double xSpacing = width * 0.0416666;
+        double ySpacing = height * 0.0938438;
+        root.setPadding(new Insets(xSpacing,ySpacing,xSpacing,ySpacing));
+        root.setHgap(width * 0.0208333);
+        root.setVgap(xSpacing);
 
-        voltarButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
-        voltarButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
-        voltarButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
+        double backButtonSize = width * 0.1;
 
-        adicionarButton.setPrefWidth(tamanhoTela.getWidth() * 0.121875);
-        adicionarButton.setFont(new Font(tamanhoTela.getWidth() * 0.012));
-        adicionarButton.setPrefHeight(tamanhoTela.getHeight() * 0.03703);
+        backButton.setMinSize(backButtonSize, backButtonSize);
+        backButton.setPrefSize(backButtonSize, backButtonSize);
+        backButton.setMaxSize(backButtonSize, backButtonSize);
+        backButton.setGraphic(new FontIcon("far-arrow-alt-circle-left:48:white"));
+        backButton.getStyleClass().add(CLASS_BACK_BUTTON);
 
-        // CSS
+        double iconContactButtonSize = 0.1458333;
 
-        voltarButton.getStyleClass().add(CLASSE_BOTAO_VOLTAR);
-        adicionarButton.getStyleClass().add(CLASSE_BOTAO_ADICIONAR);
+        iconContactButton.setMinSize(iconContactButtonSize, iconContactButtonSize);
+        iconContactButton.setPrefSize(iconContactButtonSize, iconContactButtonSize);
+        iconContactButton.setMaxSize(iconContactButtonSize, iconContactButtonSize);
+        iconContactButton.setGraphic(new FontIcon("fas-portrait:64:blue"));
+        iconContactButton.setDisable(true);
+        iconContactButton.setBackground(Background.EMPTY);
 
-        // Criando efeito de sombra externa que será usado nos campos
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(LOCATION_CONTACT_FIELDS_VIEW), resourceBundle);
+            Parent contactFields = loader.load();
+            root.getChildren().add(contactFields);
+            GridPane.setConstraints(contactFields, 0,1);
+            controllerContactFields = loader.getController();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        double bottomButtonsWidth = width * 0.20833333;
+        double bottomButtonFontSize = width * 0.0375;
+        double bottomButtonHeight = height * 0.075075;
+
+        clearButton.setPrefWidth(bottomButtonsWidth);
+        clearButton.setFont(new Font(bottomButtonFontSize));
+        clearButton.setPrefHeight(bottomButtonHeight);
+
+        addButton.setPrefWidth(bottomButtonsWidth);
+        addButton.setFont(new Font(bottomButtonFontSize));
+        addButton.setPrefHeight(bottomButtonHeight);
+
+        clearButton.getStyleClass().add(CLASS_CLEAR_BUTTON);
+        addButton.getStyleClass().add(CLASS_ADD_BUTTON);
 
         DropShadow dropShadow = new DropShadow(1.8, Color.GRAY);
 
-        imageView.setEffect(dropShadow);
+        iconContactButton.setEffect(dropShadow);
     }
 
-    /*
-     * Primeiramente será verificado se existem campos obrigatórios que não foram preenchidos ou se existem campos
-     * inválidos.
-     * Se isso acontecer, será exibido um Alert informando o erro ao usuário.
-     * Se não for encontrado erro, será executada a query no banco através do objeto contatoDAO que retornará true em caso
-     * de sucesso e false em caso de erro. Se o contato for inserido com sucesso, será exibido um alert com a mensagem de sucesso,
-     * Se tiver sido ocorrido um erro ao inserir o contato, tambem será exibido um alert com uma mensagem de erro
-     * */
 
     @FXML
-    public void handleAdicionar() {
+    public void handleAdd() {
 
         try {
-            Contact contact = fields.buildContactFromFields();
-            Task<Integer> task = new Task<>() {
+            Contact contact = controllerContactFields.buildContactFromFields();
+            Task<Integer> task = new Task<Integer>() {
                 @Override
                 protected Integer call() {
                     root.setCursor(Cursor.WAIT);
-                    DAO<Contact> dao = new ContactDAO();
+                    DAO<Contact> dao = DAOFactory.getContactDAO();
                     return dao.insert(contact);
                 }
             };
@@ -132,42 +150,54 @@ public class ControllerAddContact extends Controller implements Initializable {
             task.setOnSucceeded(event -> {
                 root.setCursor(Cursor.DEFAULT);
                 if (task.getValue() >= 0) {
-                    showAlert(Alert.AlertType.INFORMATION, "Processamento Realizado", "Contato inserido com sucesso",
-                            "O contato foi adicionado a lista de contatos com sucesso!", root);
+                    showAlert(Alert.AlertType.INFORMATION, resources.getString(BUNDLE_KEY_ALERT_INFORMATION_TITLE),
+                                                           resources.getString(BUNDLE_KEY_ALERT_INFORMATION_HEADER_TEXT),
+                                                           resources.getString(BUNDLE_KEY_ALERT_INFORMATION_CONTENT_TEXT),
+                                                           root);
 
 
                     contact.setIdContact(task.getValue());
 
                 } else {
-                    showAlert(Alert.AlertType.ERROR, "Erro no Processamento", "Não foi possível inserir o contato",
-                            "Verifique se os campos já não foram adicionados a outros contatos", root);
+                    showAlert(Alert.AlertType.ERROR, resources.getString(BUNDLE_KEY_ALERT_ERROR_TITLE),
+                                                     resources.getString(BUNDLE_KEY_ALERT1_ERROR_HEADER_TEXT),
+                                                     resources.getString(BUNDLE_KEY_ALERT1_ERROR_CONTENT_TEXT), root);
                 }
             });
 
             new Thread(task).start();
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Erro no Processamento", "Input inválido", e.getMessage(), root);
+            showAlert(Alert.AlertType.ERROR, resources.getString(BUNDLE_KEY_ALERT_ERROR_TITLE),
+                                             resources.getString(BUNDLE_KEY_ALERT2_ERROR_HEADER_TEXT),
+                    e.getMessage(), root);
         }
 
     }
-
-    /* Esse método será executado quando o botão voltar for acionado
-     * Quando isso acontercer, será carregada a página principal da aplicação */
 
     @FXML
-    public void handleVoltar() {
-        Stage stage = (Stage) root.getScene().getWindow();
+    public void handleClear() {
+        controllerContactFields.clear();
+    }
+
+    @FXML
+    public void handleBack() {
+
         try {
-            Parent root = FXMLLoader.load(getClass().getResource(URL_JANELA_PRINCIPAL));
-            stage.getScene().setRoot(root);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(LOCATION_LOADING_VIEW), resources);
+            Parent loadingViewRoot = loader.load();
+
+            ControllerLoading controllerLoading = loader.getController();
+            EventHandler<ActionEvent> event = e -> controllerLoading.getContactsList(false);
+
+            AnchorPane containerRoot = (AnchorPane) root.getScene().getRoot();
+            changeView(containerRoot, root, loadingViewRoot, FROM_LEFT, event);
         } catch (IOException e) {
-            System.out.println("Erro: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
 
     }
 
 
-    public void setFields(ControllerContactFields fields) {
-        this.fields = fields;
-    }
+
+
 }

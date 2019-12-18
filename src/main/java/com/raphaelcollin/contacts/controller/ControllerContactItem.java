@@ -9,62 +9,78 @@ package com.raphaelcollin.contacts.controller;
 
 import com.raphaelcollin.contacts.model.Contact;
 import javafx.fxml.FXML;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
-import javafx.stage.Screen;
+import org.kordamp.ikonli.javafx.FontIcon;
 
-/* ListView Item */
 
-public class ControllerContactItem {
+public class ControllerContactItem extends Controller{
     @FXML
     private GridPane root;
     @FXML
-    private ImageView imageView;
+    private ImageView genderImageView;
     @FXML
     private Label idField;
     @FXML
-    private Label nomeField;
+    private Label nameField;
     @FXML
-    private Label sexoField;
+    private Label genderField;
     @FXML
-    private Label numeroField;
+    private Label numberField;
     @FXML
     private Label emailField;
     @FXML
-    private Label descricaoField;
+    private Label descriptionField;
+    @FXML
+    private Button deleteButton;
 
-    private static final String URL_IMAGEM_ICONE_MASCULINO = "file:arquivos/male-icon.png";
-    private static final String URL_IMAGEM_ICONE_FEMININO = "file:arquivos/female-icon.png";
+    private static final String LOCATION_MALE_ICON = "/male-icon.png";
+    private static final String LOCATION_FEMALE_ICON = "/female-icon.png";
+    private static final String ID_DELETE_BUTTON = "delete-button";
 
 
     public void initialize(){
-        Rectangle2D tamanhoTela = Screen.getPrimary().getBounds();
 
-        root.setVgap(-tamanhoTela.getHeight() * 0.018518);
-        root.setHgap(tamanhoTela.getWidth() * 0.010416);
+        double rootWidth = getRootWidth();
+        double rootHeight = getRootHeight();
 
-        nomeField.setFont(new Font(tamanhoTela.getWidth()* 0.012));
-        numeroField.setFont(new Font(tamanhoTela.getWidth() * 0.012));
+        root.setVgap(-rootHeight * 0.0375375);
+        root.setHgap(rootWidth * 0.0208333);
+
+        genderImageView.setFitHeight(rootWidth * 0.125);
+        genderImageView.setFitWidth(rootWidth * 0.125);
+
+        double fontSize = rootWidth * 0.0416666;
+        double buttonSize = rootWidth * 0.072916;
+
+        nameField.setFont(new Font(fontSize));
+        numberField.setFont(new Font(fontSize));
+        deleteButton.setPrefSize(buttonSize, buttonSize);
+        deleteButton.setMinSize(buttonSize, buttonSize);
+        deleteButton.setMaxSize(buttonSize,buttonSize);
+        deleteButton.setGraphic(new FontIcon("far-trash-alt:24:white"));
+        deleteButton.setId(ID_DELETE_BUTTON);
+        HBox.setMargin(deleteButton, new Insets(0,fontSize,0,0));
 
     }
 
     void setupControls(Contact contact) {
         idField.setText(String.format("%d", contact.getIdContact()));
-        nomeField.setText(contact.getName());
-        sexoField.setText(contact.getGender());
-        if (sexoField.getText().equalsIgnoreCase("Masculino")){
-            imageView.setImage(new Image(URL_IMAGEM_ICONE_MASCULINO));
+        nameField.setText(contact.getName());
+        genderField.setText(contact.getGender());
+        if (genderField.getText().equalsIgnoreCase("Male")){
+            genderImageView.setImage(new Image(getClass().getResourceAsStream(LOCATION_MALE_ICON)));
         } else {
-            imageView.setImage(new Image(URL_IMAGEM_ICONE_FEMININO));
+            genderImageView.setImage(new Image(getClass().getResourceAsStream(LOCATION_FEMALE_ICON)));
         }
-        numeroField.setText(contact.getPhoneNumber());
+        numberField.setText(contact.getPhoneNumber());
         emailField.setText(contact.getEmail());
-        descricaoField.setText(contact.getDescription());
+        descriptionField.setText(contact.getDescription());
     }
-
-
 }

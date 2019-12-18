@@ -8,8 +8,8 @@
 package com.raphaelcollin.contacts.controller;
 
 import com.raphaelcollin.contacts.model.Contact;
-import com.raphaelcollin.contacts.model.dao.ContactDAO;
 import com.raphaelcollin.contacts.model.dao.DAO;
+import com.raphaelcollin.contacts.model.dao.DAOFactory;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ControllerLoading extends Controller implements Initializable {
+
     @FXML
     private VBox root;
     @FXML
@@ -38,76 +39,92 @@ public class ControllerLoading extends Controller implements Initializable {
     @FXML
     private ProgressIndicator indicator;
 
-    private ResourceBundle bundle;
-
     private static final String LOCATION_CONTACT_VIEW = "/contact_item.fxml";
     private static final String LOCATION_DASHBOARD_VIEW = "/dashboard.fxml";
     private Task<ObservableList<GridPane>> task;
+    private ResourceBundle resources;
+
+    private static final String BUNDLE_KEY_LABEL_TEXT = "loading_view_label_text";
+    private static final String BUNDLE_KEY_ALERT_TITLE = "alert_error_title";
+    private static final String BUNDLE_KEY_ALERT_CONTENT_TEXT = "loading_view_alert_content_text";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.bundle = resourceBundle;
 
-        root.setPrefSize(getRootWidth(), getRootHeight());
-        root.setMinSize(getRootWidth(), getRootHeight());
-        root.setMaxSize(getRootWidth(), getRootHeight());
+        this.resources = resourceBundle;
 
-        root.setSpacing(20);
+        double width = getRootWidth();
+        double height = getRootHeight();
 
-        label.setFont(Font.font(30));
-        indicator.setPrefSize(80, 80);
-        indicator.setMinSize(80, 80);
-        indicator.setMaxSize(80, 80);
+        root.setPrefSize(width, height);
+        root.setMinSize(width, height);
+        root.setMaxSize(width, height);
 
-        try {
+        root.setSpacing(height * 0.0375375);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(LOCATION_DASHBOARD_VIEW), bundle);
-            Parent dashboardRoot = loader.load();
-            ControllerDashboard dashboardController = loader.getController();
+        label.setFont(Font.font(width * 0.0625));
 
-            task = new Task<>() {
-                @Override
-                protected ObservableList<GridPane> call() throws Exception {
+        double indicatorSize = width * 0.166666;
 
-                    DAO<Contact> dao = new ContactDAO();
+        indicator.setPrefSize(indicatorSize, indicatorSize);
+        indicator.setMinSize(indicatorSize, indicatorSize);
+        indicator.setMaxSize(indicatorSize, indicatorSize);
 
-                    ObservableList<Contact> contacts = dao.selectAll();
 
-                    if (contacts == null) {
-                        return null;
-                    }
+        task = new Task<>() {
+            @Override
+            protected ObservableList<GridPane> call() throws Exception {
 
-                    ObservableList<GridPane> gridList = FXCollections.observableArrayList();
+                DAO<Contact> dao = DAOFactory.getContactDAO();
 
-                    for (Contact contact : contacts) {
+                ObservableList<Contact> contacts = dao.selectAll();
 
-                        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(LOCATION_CONTACT_VIEW));
-                        GridPane gridPane = fxmlLoader.load();
+                if (contacts == null) {
+                    return null;
+                }
 
-                        ControllerContactItem controllerContactItem = fxmlLoader.getController();
-                        controllerContactItem.setupControls(contact);
+                ObservableList<GridPane> gridList = FXCollections.observableArrayList();
 
-                        gridList.add(gridPane);
+                for (Contact contact : contacts) {
 
-                    }
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(LOCATION_CONTACT_VIEW));
+                    GridPane gridPane = fxmlLoader.load();
 
-                    Thread.sleep(1000);;
+                    ControllerContactItem controllerContactItem = fxmlLoader.getController();
+                    controllerContactItem.setupControls(contact);
 
-                    return gridList;
+                    gridList.add(gridPane);
 
                 }
-            };
 
-            task.setOnSucceeded(e -> {
+                return gridList;
+
+            }
+        };
+
+    }
+
+    public void getContactsList(boolean transition) {
+
+
+
+        task.setOnSucceeded(e -> {
+
+            indicator.setOpacity(0.0);
+
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(LOCATION_DASHBOARD_VIEW), resources);
+                Parent dashboardRoot = loader.load();
+                ControllerDashboard dashboardController = loader.getController();
 
                 ObservableList<GridPane> contactsList = task.getValue();
 
                 if (contactsList == null) {
-                    label.setText("Erro no Banco de Dados");
+                    label.setText(resources.getString(BUNDLE_KEY_LABEL_TEXT));
                     indicator.setOpacity(0);
 
-                    showAlert(Alert.AlertType.ERROR, "Contatos", "Erro no Banco de Dados",
-                            "Não foi possível se conectar ao Banco de Dados MYSQL", root);
+                    showAlert(Alert.AlertType.ERROR, resources.getString(BUNDLE_KEY_ALERT_TITLE), resources.getString(BUNDLE_KEY_LABEL_TEXT),
+                            resources.getString(BUNDLE_KEY_ALERT_CONTENT_TEXT), root);
 
                     Platform.exit();
 
@@ -116,18 +133,20 @@ public class ControllerLoading extends Controller implements Initializable {
                     AnchorPane containerRoot = (AnchorPane) root.getScene().getRoot();
                     dashboardController.setupContacts(contactsList);
 
-                    changeView(containerRoot, root, dashboardRoot, FROM_RIGHT);
+                    if (transition) {
+                        changeView(containerRoot, root, dashboardRoot, FROM_RIGHT, null);
+                    } else {
+                        containerRoot.getChildren().setAll(dashboardRoot);
+                    }
 
                 }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
 
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public void getContactsList() {
+        });
+
         new Thread(task).start();
     }
-
 }
