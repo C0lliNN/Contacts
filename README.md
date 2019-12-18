@@ -1,7 +1,7 @@
 # Contacts
 An User Interface Application with MySQL database developed in Java using JavaFX
 
-![contato2](https://i.imgur.com/HcOGd49.png)
+![contato2](https://github.com/C0lliNN/Contacts/blob/master/screenshots/multiple.png)
 
 ## Requirements
 
